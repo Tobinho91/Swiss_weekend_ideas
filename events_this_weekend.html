@@ -1,0 +1,2515 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wochenend-Events Schweiz | 21.03.–22.03.2026</title>
+    <style>
+        :root {
+            --primary: #C41E3A;
+            --secondary: #1A1A2E;
+            --accent: #16213E;
+            --bg: #F5F5F0;
+            --card-bg: #FFFFFF;
+            --border: #E0E0E0;
+            --success: #2E7D32;
+            --diff-easy: #4CAF50;
+            --diff-medium: #FF9800;
+            --diff-hard: #F44336;
+            --diff-very-hard: #9C27B0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--secondary);
+            line-height: 1.6;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+
+        /* Header */
+        header {
+            background: var(--accent);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+        header h1 { font-size: 1.8rem; margin-bottom: 0.3rem; }
+        header .date-range {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        header .stats {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        /* Filter Panel */
+        .filter-panel {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+        .filter-panel h3 {
+            width: 100%;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #666;
+            margin-bottom: 0;
+        }
+        .filter-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+        .filter-group label {
+            font-size: 0.75rem;
+            color: #666;
+            margin-right: 0.3rem;
+            align-self: center;
+        }
+        .filter-btn {
+            padding: 0.35rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+        .filter-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .filter-select {
+            padding: 0.35rem 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            background: white;
+        }
+        .filter-count {
+            margin-left: auto;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        /* Section headers */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 2rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary);
+        }
+        .section-header h2 {
+            font-size: 1.3rem;
+            color: var(--secondary);
+        }
+        .section-count {
+            background: var(--primary);
+            color: white;
+            padding: 0.1rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        /* Event Cards Grid */
+        .event-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+        .event-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+        }
+        .event-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+        .event-card-img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            background: var(--border);
+        }
+        .event-card-img-placeholder {
+            width: 100%;
+            height: 160px;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+        }
+        .save-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.9);
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 1;
+            line-height: 1;
+        }
+        .save-btn:hover { transform: scale(1.15); background: white; }
+        .save-btn.saved { background: var(--primary); color: white; }
+        .event-card-img-wrapper { position: relative; }
+        .hike-card-img-wrapper { position: relative; }
+        .saved-filter-btn {
+            background: var(--primary) !important;
+            color: white !important;
+            border-color: var(--primary) !important;
+        }
+        .event-card-body { padding: 0.8rem; }
+        .event-card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .event-card-meta {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        .event-card-meta span { display: block; margin-top: 0.15rem; }
+        .event-card-price {
+            display: inline-block;
+            margin-top: 0.4rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .price-free {
+            background: #E8F5E9;
+            color: var(--success);
+        }
+        .price-paid {
+            background: #FFF3E0;
+            color: #E65100;
+        }
+        .event-card-link {
+            display: inline-block;
+            margin-top: 0.5rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .event-card-link:hover { text-decoration: underline; }
+
+        /* Divider */
+        .section-divider {
+            text-align: center;
+            margin: 3rem 0 1rem;
+            position: relative;
+        }
+        .section-divider::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--border);
+        }
+        .section-divider h2 {
+            display: inline-block;
+            background: var(--bg);
+            padding: 0 1rem;
+            position: relative;
+            font-size: 1.4rem;
+            color: var(--accent);
+        }
+
+        /* Hike Cards */
+        .hike-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            transition: box-shadow 0.2s ease;
+            margin-bottom: 1rem;
+            display: flex;
+        }
+        .hike-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .hike-card-img {
+            width: 200px;
+            min-height: 150px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        .hike-card-img-placeholder {
+            width: 200px;
+            min-height: 150px;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #2E7D32, #4CAF50);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+        }
+        .hike-card-body { padding: 1rem; flex: 1; }
+        .hike-card-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.4rem; }
+        .hike-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin: 0.4rem 0;
+            font-size: 0.85rem;
+            color: #555;
+        }
+        .difficulty-badge {
+            display: inline-block;
+            padding: 0.15rem 0.6rem;
+            border-radius: 12px;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .diff-leicht { background: var(--diff-easy); }
+        .diff-mittel { background: var(--diff-medium); }
+        .diff-schwer { background: var(--diff-hard); }
+        .diff-sehr-schwer { background: var(--diff-very-hard); }
+        .hike-card-desc {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 0.3rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .hike-card-links {
+            margin-top: 0.5rem;
+            display: flex;
+            gap: 1rem;
+        }
+        .hike-card-links a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .hike-card-links a:hover { text-decoration: underline; }
+
+        /* Footer */
+        footer {
+            background: var(--accent);
+            color: white;
+            padding: 1.5rem 0;
+            margin-top: 3rem;
+            text-align: center;
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+        footer a { color: #AAB8C2; }
+        .sources-failed {
+            margin-top: 0.5rem;
+            color: #FF9800;
+            font-size: 0.8rem;
+        }
+
+        /* No results */
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            color: #999;
+            font-style: italic;
+            display: none;
+        }
+
+        /* Main Tabs */
+        .main-tabs {
+            display: flex;
+            gap: 0;
+            margin: 1.5rem 0 0;
+            border-bottom: 2px solid var(--border);
+        }
+        .main-tab {
+            padding: 0.8rem 2rem;
+            border: none;
+            background: none;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #888;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s ease;
+        }
+        .main-tab:hover { color: var(--secondary); }
+        .main-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        .main-tab .tab-count {
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: #999;
+            margin-left: 0.3rem;
+        }
+        .main-tab.active .tab-count { color: var(--primary); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header h1 { font-size: 1.4rem; }
+            .hike-card { flex-direction: column; }
+            .hike-card-img, .hike-card-img-placeholder { width: 100%; height: 160px; min-height: auto; }
+            .filter-panel { gap: 0.5rem; }
+            .main-tab { padding: 0.6rem 1rem; font-size: 0.95rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Wochenend-Events Schweiz</h1>
+            <div class="date-range">
+                Samstag, 21. März 2026 &mdash; Sonntag, 22. März 2026
+            </div>
+            <div class="stats">
+                48 Events &middot; 10 Wanderrouten
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Main Tabs -->
+        <div class="main-tabs">
+            <button class="main-tab active" data-tab="events">Events <span class="tab-count">(48)</span></button>
+            <button class="main-tab" data-tab="hikes">Wanderrouten <span class="tab-count">(10)</span></button>
+            <button class="main-tab" data-tab="favorites">&#9829; Favoriten <span class="tab-count" id="fav-count">(0)</span></button>
+        </div>
+
+        <!-- Events Tab -->
+        <div class="tab-content active" id="tab-events">
+
+        <!-- Event Filter Panel -->
+        <div class="filter-panel" id="event-filters">
+            <h3>Events filtern</h3>
+            <div class="filter-group">
+                <label>Kategorie:</label>
+                <button class="filter-btn active" data-filter="event-category" data-value="all">Alle</button>
+                
+                <button class="filter-btn" data-filter="event-category" data-value="Kultur & Kunst">Kultur & Kunst</button>
+                
+                <button class="filter-btn" data-filter="event-category" data-value="Sport">Sport</button>
+                
+                <button class="filter-btn" data-filter="event-category" data-value="Märkte & Feste">Märkte & Feste</button>
+                
+                <button class="filter-btn" data-filter="event-category" data-value="Gastronomie">Gastronomie</button>
+                
+                <button class="filter-btn" data-filter="event-category" data-value="Sonstiges">Sonstiges</button>
+                
+            </div>
+            <div class="filter-group">
+                <label>Tag:</label>
+                <button class="filter-btn active" data-filter="event-day" data-value="all">Beide</button>
+                <button class="filter-btn" data-filter="event-day" data-value="Samstag">Samstag</button>
+                <button class="filter-btn" data-filter="event-day" data-value="Sonntag">Sonntag</button>
+            </div>
+            <div class="filter-group">
+                <label>Kanton:</label>
+                <select class="filter-select" data-filter="event-canton" id="event-canton-select">
+                    <option value="all">Alle Kantone</option>
+                    
+                    <option value=""></option>
+                    
+                    <option value="BE">BE</option>
+                    
+                    <option value="BS">BS</option>
+                    
+                    <option value="GE">GE</option>
+                    
+                    <option value="LU">LU</option>
+                    
+                    <option value="SG">SG</option>
+                    
+                    <option value="SO">SO</option>
+                    
+                    <option value="TG">TG</option>
+                    
+                    <option value="VD">VD</option>
+                    
+                    <option value="ZG">ZG</option>
+                    
+                    <option value="ZH">ZH</option>
+                    
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Preis:</label>
+                <button class="filter-btn active" data-filter="event-price" data-value="all">Alle</button>
+                <button class="filter-btn" data-filter="event-price" data-value="free">Gratis</button>
+                <button class="filter-btn" data-filter="event-price" data-value="paid">Kostenpflichtig</button>
+            </div>
+            <div class="filter-group">
+                <button class="filter-btn" data-filter="event-saved" data-value="saved" id="event-saved-btn">&#9829; Gespeicherte</button>
+            </div>
+            <div class="filter-count" id="event-count">48 Events</div>
+        </div>
+
+        <!-- Events nach Kategorie -->
+        
+        <section class="event-section" data-category="Kultur & Kunst">
+            <div class="section-header">
+                <h2>Kultur & Kunst</h2>
+                <span class="section-count">11</span>
+            </div>
+            <div class="event-grid">
+                
+                <article class="event-card"
+                         data-category="Kultur & Kunst"
+                         data-day="Samstag"
+                         data-canton=""
+                         data-price="paid"
+                         data-id="event-7427770523910728000">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7427770523910728000" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/31/e0/31e0c718-60e9-4117-8cf6-9947eeab118f-6X2XSGW3.webp" alt="Atmen und Gestalten" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Atmen und Gestalten</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>BnB Flusshaus &middot; Brugg, </span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/kurse-seminare/kunst-kultur/atmen-und-gestalten-7427770523910728000.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Kultur & Kunst"
+                         data-day="Samstag"
+                         data-canton=""
+                         data-price="paid"
+                         data-id="event-7432505915041947811">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7432505915041947811" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/th/ur/thurgaukultur-neu1-051IMP4U.webp" alt="13. Jugendfilm Festival - Movie Day" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">13. Jugendfilm Festival - Movie Day</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>Kino Roxy &middot; Romanshorn, </span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/freizeit-ausfluege/film-kino/13-jugendfilm-festival-movie-day-7432505915041947811.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Kultur & Kunst"
+                         data-day="Samstag"
+                         data-canton=""
+                         data-price="paid"
+                         data-id="event-7429450632333902189">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7429450632333902189" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/av/os/avo-shooting23-echinacea-13-IKF016XO.webp" alt="Frühlingstag" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Frühlingstag</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>A.Vogel AG &middot; Roggwil, </span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/fuehrungen-vortraege/fuehrung/fruehlingstag-7429450632333902189.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Kultur & Kunst"
+                         data-day="Samstag"
+                         data-canton="ZH"
+                         data-price="paid"
+                         data-id="event-7422657438984180313">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7422657438984180313" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/mo/ve/movement-in-pics-horizontal-titelbil-U2KDLEND.webp" alt="Rigging 1.0 – Basic" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Rigging 1.0 – Basic</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>Zirkusquartier Zürich &middot; Zürich, ZH</span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/kurse-seminare/sonstige-kurse-seminare/rigging-1-0-basic-7422657438984180313.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Kultur & Kunst"
+                         data-day="Samstag"
+                         data-canton=""
+                         data-price="paid"
+                         data-id="event-7422195488940639229">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7422195488940639229" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/al/ic/alice-pasqual-xdd-x2y2spi-unsplash-3WXZZGUZ.webp" alt="Kleine Tee Reise – Teekurs für Einsteiger in Dielsdorf (ZH)" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Kleine Tee Reise – Teekurs für Einsteiger in Dielsdorf (ZH)</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>Bleu Du Monde &middot; Dielsdorf, </span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/kurse-seminare/freizeit-hobby/kleine-tee-reise-teekurs-fuer-einsteiger-in-dielsdorf-zh-7422195488940639229.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Kultur & Kunst"
+                         data-day="Samstag"
+                         data-canton=""
+                         data-price="paid"
+                         data-id="event-7420446175738755171">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7420446175738755171" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/bi/ld/bildschirmfoto-2026-01-23-um-13-41-1-OORATI4S.webp" alt="Wochenendseminar: Anleitung zum Unglücklichsein" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Wochenendseminar: Anleitung zum Unglücklichsein</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>axionum psychlogische praxis &middot; Küssnacht, </span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/kurse-seminare/soziale-weiterbildung/wochenendseminar-anleitung-zum-ungluecklichsein-7420446175738755171.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Kultur & Kunst"
+                         data-day="Samstag"
+                         data-canton="SO"
+                         data-price="paid"
+                         data-id="event-7420409828399411066">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7420409828399411066" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/ke/in/kein-titel-deine-geschichte-QS0DA77Y.webp" alt="Selbstbewusstsein" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Selbstbewusstsein</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>Villa Loreto - Coworking Solothurn &middot; Solothurn, SO</span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/kurse-seminare/coaching/selbstbewusstsein-7420409828399411066.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Kultur & Kunst"
+                         data-day="Samstag"
+                         data-canton=""
+                         data-price="paid"
+                         data-id="event-7440891283214731510">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7440891283214731510" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/st/im/stimme-szene-selbst-IG3NMETO.jpg" alt="Stimme. Szene. Selbst." loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Stimme. Szene. Selbst.</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>Klanghaus Toggenburg &middot; Unterwasser, </span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/kurse-seminare/stimme-szene-selbst-7440891283214731510.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Kultur & Kunst"
+                         data-day="Samstag"
+                         data-canton="ZH"
+                         data-price="paid"
+                         data-id="event-7313605535210677869">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7313605535210677869" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/bi/ld/bildschirmfoto-2026-01-14-um-09-19-5-SOQSFMLB.webp" alt="One Heart Worship Day 2026" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">One Heart Worship Day 2026</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>Equippers Friedenskirche &middot; Zürich, ZH</span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/kurse-seminare/glauben-religion/one-heart-worship-day-2026-7313605535210677869.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Kultur & Kunst"
+                         data-day="Samstag"
+                         data-canton=""
+                         data-price="paid"
+                         data-id="event-7431341214266355624">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7431341214266355624" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/mo/de/modern-business-coffee-brunch-settin-DQ10YZEW.webp" alt="Business Brunch la Macos Coffee Crafters" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Business Brunch la Macos Coffee Crafters</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>Macos Coffee Crafters &middot; Steinhausen, </span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/kurse-seminare/wirtschaft/business-brunch-la-macos-coffee-crafters-7431341214266355624.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Kultur & Kunst"
+                         data-day="Samstag"
+                         data-canton=""
+                         data-price="paid"
+                         data-id="event-7430195753782352638">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7430195753782352638" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/ba/nn/banner-eventfrog-NY01T075.webp" alt="LR Motivation Day - Gruyère" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">LR Motivation Day - Gruyère</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>House of Gruyères &middot; Gruyères, </span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/kurse-seminare/sonstige-kurse-seminare/lr-motivation-day-gruyere-7430195753782352638.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+            </div>
+        </section>
+        
+        <section class="event-section" data-category="Sport">
+            <div class="section-header">
+                <h2>Sport</h2>
+                <span class="section-count">2</span>
+            </div>
+            <div class="event-grid">
+                
+                <article class="event-card"
+                         data-category="Sport"
+                         data-day="Samstag"
+                         data-canton=""
+                         data-price="paid"
+                         data-id="event-7374850004387649152">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7374850004387649152" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/fu/er/fuer-eventfrog-17.png" alt="Crazy Brunch & Dance mit DJ Pitt" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Crazy Brunch & Dance mit DJ Pitt</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>Hotel Sternen &middot; Alt St.  Johann, </span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/sport-fitness/tanzsport/crazy-brunch-dance-mit-dj-pitt-7374850004387649152.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Sport"
+                         data-day="Samstag"
+                         data-canton="ZG"
+                         data-price="paid"
+                         data-id="event-7440058397263686010">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7440058397263686010" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/sp/or/sport-fitness-O5EMVE65.webp" alt="Erstes Jubiläum der BoulderBaar" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Erstes Jubiläum der BoulderBaar</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>BoulderBaar &middot; Baar, ZG</span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/sport-fitness/fitness/erstes-jubilaeum-der-boulderbaar-7440058397263686010.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+            </div>
+        </section>
+        
+        <section class="event-section" data-category="Märkte & Feste">
+            <div class="section-header">
+                <h2>Märkte & Feste</h2>
+                <span class="section-count">6</span>
+            </div>
+            <div class="event-grid">
+                
+                <article class="event-card"
+                         data-category="Märkte & Feste"
+                         data-day="Samstag"
+                         data-canton=""
+                         data-price="paid"
+                         data-id="event-7437530980385079974">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7437530980385079974" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/af/fi/affiche-jeu-de-piste-RB8JG3VU.webp" alt="Jeu de piste de Pâques" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Jeu de piste de Pâques</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>Rte de Plan-de-Croix 220 &middot; Vionnaz, </span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/volksfeste/sonstige-feste/jeu-de-piste-de-paques-7437530980385079974.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Märkte & Feste"
+                         data-day="Samstag"
+                         data-canton=""
+                         data-price="paid"
+                         data-id="event-7437609186010097797">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7437609186010097797" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/02/fl/02-flohmi-tag-2026-la21-newsletter-6LPJXKAM.webp" alt="Stäfner Flohmi-Täg" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Stäfner Flohmi-Täg</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>Ganz Stäfa und Uerikon &middot; Stäfa, </span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/maerkte/flohmarkt/staefner-flohmi-taeg-7437609186010097797.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Märkte & Feste"
+                         data-day="Samstag"
+                         data-canton=""
+                         data-price="paid"
+                         data-id="event-7437048435415458609">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7437048435415458609" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/he/ba/hebammenpraxis-langnau-symbolbild-hi-SPUN8CAX.webp" alt="Tag der offenen Tür Selawi Hebammenpraxis" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Tag der offenen Tür Selawi Hebammenpraxis</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>Selawi Hebammenpraxis & Gesundheitszentrum &middot; Langnau im Emmental, </span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/messen/gewerbeschau/tag-der-offenen-tuer-selawi-hebammenpraxis-7437048435415458609.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Märkte & Feste"
+                         data-day="Samstag"
+                         data-canton=""
+                         data-price="paid"
+                         data-id="event-7434884575048788059">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7434884575048788059" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/ey/sa/eysae-dorfmaercht-21-03-2026-det-9MIUDCYL.webp" alt="Eysä Dorfmärcht - viuseytig und guäd" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Eysä Dorfmärcht - viuseytig und guäd</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>Dorfplatz Ennetbürgen &middot; Ennetbürgen, </span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/maerkte/sonstige-maerkte/eysae-dorfmaercht-viuseytig-und-guaed-7434884575048788059.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Märkte & Feste"
+                         data-day="Samstag"
+                         data-canton=""
+                         data-price="paid"
+                         data-id="event-7434593141112481685">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7434593141112481685" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/ma/er/maerkte-secondhand-SLZWUGQG.webp" alt="Säuliämtler Stoffbördse" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Säuliämtler Stoffbördse</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>Nähloft59 &middot; Affoltern am Albis, </span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/maerkte/second-hand/saeuliaemtler-stoffboerdse-7434593141112481685.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Märkte & Feste"
+                         data-day="Samstag"
+                         data-canton=""
+                         data-price="paid"
+                         data-id="event-7434590371626102932">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7434590371626102932" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/ma/er/maerkte-secondhand-SLZWUGQG.webp" alt="Säuliämtler Stoffbörse" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Säuliämtler Stoffbörse</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>Nähloft59 &middot; Affoltern am Albis, </span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/maerkte/second-hand/saeuliaemtler-stoffboerse-7434590371626102932.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+            </div>
+        </section>
+        
+        <section class="event-section" data-category="Gastronomie">
+            <div class="section-header">
+                <h2>Gastronomie</h2>
+                <span class="section-count">1</span>
+            </div>
+            <div class="event-grid">
+                
+                <article class="event-card"
+                         data-category="Gastronomie"
+                         data-day="Samstag"
+                         data-canton=""
+                         data-price="paid"
+                         data-id="event-7440894603127973188">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7440894603127973188" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/br/un/brunch-T4DBM46C.jpg" alt="Brunch" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Brunch</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>Gasthaus Traube Azmoos &middot; Azmoos, </span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/essen-trinken/brunch-7440894603127973188.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+            </div>
+        </section>
+        
+        <section class="event-section" data-category="Sonstiges">
+            <div class="section-header">
+                <h2>Sonstiges</h2>
+                <span class="section-count">28</span>
+            </div>
+            <div class="event-grid">
+                
+                <article class="event-card"
+                         data-category="Sonstiges"
+                         data-day="Samstag"
+                         data-canton="TG"
+                         data-price="paid"
+                         data-id="event-7424949518326591172">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7424949518326591172" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/re/pa/repair-cafe-TX8B27SA.jpg" alt="Repair Café" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Repair Café</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>Eisenwerk &middot; Frauenfeld, TG</span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/diverses/repair-cafe-7424949518326591172.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Sonstiges"
+                         data-day="Samstag"
+                         data-canton=""
+                         data-price="paid"
+                         data-id="event-7419745252037103394">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7419745252037103394" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/ag/en/agenda-2026-YZ2MQ3ED.webp?_=1769005083000" alt="Plantes sauvages comestibles au fil des saisons" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Plantes sauvages comestibles au fil des saisons</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>Région Chablais suisse &middot; Région Chablais suisse, </span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/gruppen/plantes-sauvages-comestibles-au-fil-des-saisons-7419745252037103394.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Sonstiges"
+                         data-day="Samstag"
+                         data-canton=""
+                         data-price="paid"
+                         data-id="event-7394312866424179543">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7394312866424179543" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/qu/an/quantensprung-schmetterling-DQUO3NOJ.webp" alt="Workshop "Dein Quantensprung - 2026"" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Workshop "Dein Quantensprung - 2026"</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>ZiitRuum7 &middot; Buchs, </span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/gesundheit-spiritualitaet/gesundheit-wohlbefinden/workshop-dein-quantensprung-2026-7394312866424179543.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Sonstiges"
+                         data-day="Samstag"
+                         data-canton=""
+                         data-price="paid"
+                         data-id="event-7439247713214973625">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7439247713214973625" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/td/ss/tds-season-opening-flyer-quer-9SCXGVY2.webp" alt="Season Opening Showroom mit Veloverkauf" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Season Opening Showroom mit Veloverkauf</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>Tour de Suisse Rad AG &middot; Kreuzlingen, </span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/diverses/season-opening-showroom-mit-veloverkauf-7439247713214973625.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Sonstiges"
+                         data-day="Samstag"
+                         data-canton=""
+                         data-price="paid"
+                         data-id="event-7436886700465355421">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7436886700465355421" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/im/g6/img-6970-C5ARR48W.webp?_=1773091916000" alt="Tag der offenen Tür im Grot" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Tag der offenen Tür im Grot</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>Im Grot &middot; Grenchen, </span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/gruppen/tag-der-offenen-tuer-im-grot-7436886700465355421.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Sonstiges"
+                         data-day="Samstag"
+                         data-canton="BE"
+                         data-price="paid"
+                         data-id="event-7434170232552348502">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7434170232552348502" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/15/fe/15fe278036a1aeee1de4ab560cb2886593d0-EHJRYK31.webp?_=1772444293000" alt="Fabrice Hyber. L’Artiste Agriculteur" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Fabrice Hyber. L’Artiste Agriculteur</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>Kunstmuseum Thun - Thunerhof &middot; Thun, BE</span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/gruppen/fabrice-hyber-lartiste-agriculteur-7434170232552348502.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Sonstiges"
+                         data-day="Samstag"
+                         data-canton="BE"
+                         data-price="paid"
+                         data-id="event-7434165412177147242">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7434165412177147242" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/ee/33/ee33d80c1e0a4e648f4d38363d7034a762c9-OZ4TNB7C.webp?_=1772443150000" alt="Lumpen Station. Töne-Ton-Werden" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Lumpen Station. Töne-Ton-Werden</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>Kunstmuseum Thun - Thunerhof &middot; Thun, BE</span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/gruppen/lumpen-station-toene-ton-werden-7434165412177147242.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Sonstiges"
+                         data-day="Samstag"
+                         data-canton="SG"
+                         data-price="paid"
+                         data-id="event-7430022833718197289">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7430022833718197289" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/img/placehold_event_emblem.webp" alt="Aktionstag auf der Brache Lachen" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Aktionstag auf der Brache Lachen</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>Brache Lachen &middot; St. Gallen, SG</span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/diverses/aktionstag-auf-der-brache-lachen-7430022833718197289.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Sonstiges"
+                         data-day="Samstag"
+                         data-canton=""
+                         data-price="paid"
+                         data-id="event-7429124692588397196">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7429124692588397196" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/img/placehold_event_emblem.webp" alt="Demenz: Tag der offenen Tür" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Demenz: Tag der offenen Tür</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>OASE Tagesstätte für Menschen mit Demenz &middot; Amriswil, </span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/diverses/demenz-tag-der-offenen-tuer-7429124692588397196.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Sonstiges"
+                         data-day="Samstag"
+                         data-canton=""
+                         data-price="paid"
+                         data-id="event-7427823072747462374">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7427823072747462374" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/im/g1/img-1367-klein-BFNBJD5E.webp" alt="Frischer Wind im Körpersinn – Tag der offenen Türen" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Frischer Wind im Körpersinn – Tag der offenen Türen</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>Körpersinn &middot; Bülach, </span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/gesundheit-spiritualitaet/gesundheit-wohlbefinden/frischer-wind-im-koerpersinn-tag-der-offenen-tueren-7427823072747462374.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Sonstiges"
+                         data-day="Samstag"
+                         data-canton="ZH"
+                         data-price="paid"
+                         data-id="event-7426980728821301726">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7426980728821301726" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/ga/le/galerie-3-SIIYD0DK.webp?_=1770805470000" alt="Zen-Einführung Wiedikon - Tageskurs" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Zen-Einführung Wiedikon - Tageskurs</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. März &middot; 00:00 Uhr</span>
+                            <span>Dachraum des Bethauses an der Schlossgasse 10 in Zürich-Wiedikon &middot; Zürich, ZH</span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/gruppen/zen-einfuehrung-wiedikon-tageskurs-7426980728821301726.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Sonstiges"
+                         data-day="Sonntag"
+                         data-canton=""
+                         data-price="paid"
+                         data-id="event-7437397486229008164">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7437397486229008164" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/jo/hl/johle-und-gradhebe-2-5-tage-anita-hefti.webp?_=1773214318000" alt="Johle und Gradhebe" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Johle und Gradhebe</h3>
+                        <div class="event-card-meta">
+                            <span>Sonntag, 22. März &middot; 00:00 Uhr</span>
+                            <span>Klanghaus Toggenburg &middot; Unterwasser, </span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/gruppen/johle-und-gradhebe-7437397486229008164.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Sonstiges"
+                         data-day="Sonntag"
+                         data-canton=""
+                         data-price="paid"
+                         data-id="event-7439754343597793445">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7439754343597793445" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/ma/er/maerkte-mittelalter-Y5I322QC.webp?_=1770728657000" alt="Les Féeries du Château de La Sarraz" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Les Féeries du Château de La Sarraz</h3>
+                        <div class="event-card-meta">
+                            <span>Sonntag, 22. März &middot; 00:00 Uhr</span>
+                            <span>Château de la Sarraz &middot; La Sarraz, </span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/gruppen/les-feeries-du-chateau-de-la-sarraz-7439754343597793445.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Sonstiges"
+                         data-day="Sonntag"
+                         data-canton="LU"
+                         data-price="paid"
+                         data-id="event-7428433119416442308">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7428433119416442308" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/un/be/unbenanntes-projekt-866L0POB.jpg" alt="Kunstausstellung ARTdeSUISSE Luzern – Frühlingsausgabe 2026" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Kunstausstellung ARTdeSUISSE Luzern – Frühlingsausgabe 2026</h3>
+                        <div class="event-card-meta">
+                            <span>Sonntag, 22. März &middot; 00:00 Uhr</span>
+                            <span>Kornschütte &middot; Luzern, LU</span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/gruppen/kunstausstellung-artdesuisse-luzern-fruehlingsausgabe-2026-7428433119416442308.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Sonstiges"
+                         data-day="Sonntag"
+                         data-canton=""
+                         data-price="paid"
+                         data-id="event-7422429434974602928">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7422429434974602928" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/pu/mp/pumpfoil-workshop-VEDLKPJX.png?_=1769647317000" alt="Pumpfoil Workshops und Kurse" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Pumpfoil Workshops und Kurse</h3>
+                        <div class="event-card-meta">
+                            <span>Sonntag, 12. April &middot; 00:00 Uhr</span>
+                            <span>WHANAU Surfschule &middot; Seengen, </span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/gruppen/pumpfoil-workshops-und-kurse-7422429434974602928.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Sonstiges"
+                         data-day="Tuesday"
+                         data-canton=""
+                         data-price="paid"
+                         data-id="event-7435343384309426144">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7435343384309426144" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/bl/um/blumenherzen-2000x928-49JYR5SN.webp?_=1772724005000" alt="Oster- und Frühlingszauber im Chocolarium" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Oster- und Frühlingszauber im Chocolarium</h3>
+                        <div class="event-card-meta">
+                            <span>Tuesday, 14. April &middot; 00:00 Uhr</span>
+                            <span>Chocolarium – die Glücksfabrik von Munz und Minor &middot; Flawil, </span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/gruppen/oster-und-fruehlingszauber-im-chocolarium-7435343384309426144.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Sonstiges"
+                         data-day="Samstag"
+                         data-canton="BE"
+                         data-price="paid"
+                         data-id="event-7243853989388690069">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7243853989388690069" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/sc/ho/schokolade-suess-und-salzig-JAYPKN80-C9Z54S4Z.webp?_=1727069671000" alt="Harmonischer Morgen in der Matte" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Harmonischer Morgen in der Matte</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 25. April &middot; 00:00 Uhr</span>
+                            <span>Bärenplatz vor dem Käfigturm &middot; Bern, BE</span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/gruppen/harmonischer-morgen-in-der-matte-7243853989388690069.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Sonstiges"
+                         data-day="Monday"
+                         data-canton="BS"
+                         data-price="paid"
+                         data-id="event-7440359794773387352">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7440359794773387352" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/ce/za/cezanne-pommesetoranges-1899-lac-UF49NSG4.webp?_=1773920010000" alt="Cezanne" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Cezanne</h3>
+                        <div class="event-card-meta">
+                            <span>Monday, 25. Mai &middot; 00:00 Uhr</span>
+                            <span>Fondation Beyeler &middot; Riehen, BS</span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/gruppen/cezanne-7440359794773387352.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Sonstiges"
+                         data-day="Friday"
+                         data-canton=""
+                         data-price="paid"
+                         data-id="event-7290732359850135516">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7290732359850135516" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/g1/gr/g1-gross-MYO7G2K3.webp" alt="Motorrad Grundkurs 1" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Motorrad Grundkurs 1</h3>
+                        <div class="event-card-meta">
+                            <span>Friday, 29. Mai &middot; 00:00 Uhr</span>
+                            <span>Industriestrasse 17 &middot; Affoltern am Albis, </span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/gruppen/motorrad-grundkurs-1-7290732359850135516.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Sonstiges"
+                         data-day="Sonntag"
+                         data-canton="VD"
+                         data-price="paid"
+                         data-id="event-7427710244371886818">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7427710244371886818" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/be/rg/bergeres-tangoutes-au-108-tresses-1935-qinghai-rep.webp?_=1770904122000" alt="Ella Maillart. Récits Photographiques" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Ella Maillart. Récits Photographiques</h3>
+                        <div class="event-card-meta">
+                            <span>Sonntag, 31. Mai &middot; 00:00 Uhr</span>
+                            <span>Photo Elysée &middot; Lausanne, VD</span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/gruppen/ella-maillart-recits-photographiques-7427710244371886818.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Sonstiges"
+                         data-day="Sonntag"
+                         data-canton="VD"
+                         data-price="paid"
+                         data-id="event-7427709295037261672">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7427709295037261672" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/sa/lv/salvatore-vitale-dbgps-press-08-2-428PMFL7.webp?_=1770903896000" alt="Salvatore Vitale. SABOTAGE" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Salvatore Vitale. SABOTAGE</h3>
+                        <div class="event-card-meta">
+                            <span>Sonntag, 31. Mai &middot; 00:00 Uhr</span>
+                            <span>Photo Elysée &middot; Lausanne, VD</span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/gruppen/salvatore-vitale-sabotage-7427709295037261672.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Sonstiges"
+                         data-day="Sonntag"
+                         data-canton="VD"
+                         data-price="paid"
+                         data-id="event-7427708079905457678">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7427708079905457678" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/un/fe/un-feu-2-NLY2H95U.webp?_=1770903606000" alt="Luc Delahaye. Le bruit du monde" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Luc Delahaye. Le bruit du monde</h3>
+                        <div class="event-card-meta">
+                            <span>Sonntag, 31. Mai &middot; 00:00 Uhr</span>
+                            <span>Photo Elysée &middot; Lausanne, VD</span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/gruppen/luc-delahaye-le-bruit-du-monde-7427708079905457678.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Sonstiges"
+                         data-day="Monday"
+                         data-canton=""
+                         data-price="paid"
+                         data-id="event-7427942863059584322">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7427942863059584322" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/6a/03/6a03b7f7da473267e7cc112a0426ec383ae4-E3MUSZ6B.webp" alt="Das perfekte Dinner. Römer, Macht und Müll. Teil II" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Das perfekte Dinner. Römer, Macht und Müll. Teil II</h3>
+                        <div class="event-card-meta">
+                            <span>Monday, 8. Juni &middot; 00:00 Uhr</span>
+                            <span>Augusta Raurica &middot; Augst, </span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/gruppen/das-perfekte-dinner-roemer-macht-und-muell-teil-ii-7427942863059584322.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Sonstiges"
+                         data-day="Sonntag"
+                         data-canton="BE"
+                         data-price="paid"
+                         data-id="event-7435670157928736214">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7435670157928736214" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/or/ig/original-2-KH5HU8XZ.webp?_=1772801914000" alt="Interaktive Ausstellung: Raumcollage. Materialien erzählen." loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Interaktive Ausstellung: Raumcollage. Materialien erzählen.</h3>
+                        <div class="event-card-meta">
+                            <span>Sonntag, 23. August &middot; 00:00 Uhr</span>
+                            <span>Creaviva im Zentrum Paul Klee &middot; Bern, BE</span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/gruppen/interaktive-ausstellung-raumcollage-materialien-erzaehlen-7435670157928736214.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Sonstiges"
+                         data-day="Samstag"
+                         data-canton="BE"
+                         data-price="paid"
+                         data-id="event-7403737881871650740">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7403737881871650740" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/20/18/20181124-hdr-kontemplation-raum-h3a4846.webp?_=1765188567000" alt="Meditationstag: innehalten - schweigen - sich finden" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Meditationstag: innehalten - schweigen - sich finden</h3>
+                        <div class="event-card-meta">
+                            <span>Samstag, 21. November &middot; 00:00 Uhr</span>
+                            <span>Haus der Religionen &middot; Bern, BE</span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/gruppen/meditationstag-innehalten-schweigen-sich-finden-7403737881871650740.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Sonstiges"
+                         data-day="Sonntag"
+                         data-canton="GE"
+                         data-price="paid"
+                         data-id="event-7435677111757599566">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7435677111757599566" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/md/oi/md-oiseauxverts1-2021-copie-jpg-N3RWFCGW.webp?_=1772803572000" alt="Simultanés" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Simultanés</h3>
+                        <div class="event-card-meta">
+                            <span>Sonntag, 29. November &middot; 00:00 Uhr</span>
+                            <span>Musée Ariana &middot; Genf, GE</span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/gruppen/simultanes-7435677111757599566.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Sonstiges"
+                         data-day="Tuesday"
+                         data-canton="ZH"
+                         data-price="paid"
+                         data-id="event-7419083735906138625">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7419083735906138625" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/bi/ld/bild-37JHMM35.webp?_=1768847401000" alt="Auch realistisches Zeichnen und Malen für jedes Alter" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Auch realistisches Zeichnen und Malen für jedes Alter</h3>
+                        <div class="event-card-meta">
+                            <span>Tuesday, 22. Dezember &middot; 00:00 Uhr</span>
+                            <span>GBMZ Sieglungslokal &middot; Zürich, ZH</span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/gruppen/auch-realistisches-zeichnen-und-malen-fuer-jedes-alter-7419083735906138625.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+                <article class="event-card"
+                         data-category="Sonstiges"
+                         data-day="Thursday"
+                         data-canton=""
+                         data-price="paid"
+                         data-id="event-7429564973091700000">
+                    <div class="event-card-img-wrapper">
+                        <button class="save-btn" data-save-id="event-7429564973091700000" title="Speichern">&#9825;</button>
+                        
+                        <img class="event-card-img" src="https://eventfrog.ch/upload/rm/96/0x/960x720-erneuerbare-energien-dekarbonisierung-wand.webp?_=1771346324000" alt="Dekarb - Was? Neue Themenführung in der Umwelt Arena" loading="lazy">
+                        
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">Dekarb - Was? Neue Themenführung in der Umwelt Arena</h3>
+                        <div class="event-card-meta">
+                            <span>Thursday, 31. Dezember &middot; 00:00 Uhr</span>
+                            <span>Umwelt Arena &middot; Spreitenbach, </span>
+                        </div>
+                        
+                        <br>
+                        <a class="event-card-link" href="https://eventfrog.ch/de/p/gruppen/dekarb-was-neue-themenfuehrung-in-der-umwelt-arena-7429564973091700000.html" target="_blank" rel="noopener">Details &rarr;</a>
+                    </div>
+                </article>
+                
+            </div>
+        </section>
+        
+
+        <div class="no-results" id="no-events">Keine Events mit diesen Filtern gefunden.</div>
+
+        </div><!-- /tab-events -->
+
+        <!-- Hikes Tab -->
+        <div class="tab-content" id="tab-hikes">
+
+        <!-- Hike Filter Panel -->
+        <div class="filter-panel" id="hike-filters">
+            <h3>Wanderungen filtern</h3>
+            <div class="filter-group">
+                <label>Schwierigkeit:</label>
+                <button class="filter-btn active" data-filter="hike-difficulty" data-value="all">Alle</button>
+                <button class="filter-btn" data-filter="hike-difficulty" data-value="Leicht">Leicht</button>
+                <button class="filter-btn" data-filter="hike-difficulty" data-value="Mittel">Mittel</button>
+                <button class="filter-btn" data-filter="hike-difficulty" data-value="Schwer">Schwer</button>
+                <button class="filter-btn" data-filter="hike-difficulty" data-value="Sehr schwer">Sehr schwer</button>
+            </div>
+            <div class="filter-group">
+                <label>Kanton:</label>
+                <select class="filter-select" data-filter="hike-canton" id="hike-canton-select">
+                    <option value="all">Alle Kantone</option>
+                    
+                    <option value="AR">AR</option>
+                    
+                    <option value="BE">BE</option>
+                    
+                    <option value="GR">GR</option>
+                    
+                    <option value="LU">LU</option>
+                    
+                    <option value="SZ">SZ</option>
+                    
+                    <option value="TI">TI</option>
+                    
+                    <option value="VD">VD</option>
+                    
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Dauer:</label>
+                <button class="filter-btn active" data-filter="hike-duration" data-value="all">Alle</button>
+                <button class="filter-btn" data-filter="hike-duration" data-value="lt2h">&lt; 2h</button>
+                <button class="filter-btn" data-filter="hike-duration" data-value="2to4h">2&ndash;4h</button>
+                <button class="filter-btn" data-filter="hike-duration" data-value="gt4h">&gt; 4h</button>
+            </div>
+            <div class="filter-group">
+                <label>Distanz:</label>
+                <button class="filter-btn active" data-filter="hike-distance" data-value="all">Alle</button>
+                <button class="filter-btn" data-filter="hike-distance" data-value="lt5km">&lt; 5km</button>
+                <button class="filter-btn" data-filter="hike-distance" data-value="5to15km">5&ndash;15km</button>
+                <button class="filter-btn" data-filter="hike-distance" data-value="gt15km">&gt; 15km</button>
+            </div>
+            <div class="filter-group">
+                <button class="filter-btn" data-filter="hike-saved" data-value="saved" id="hike-saved-btn">&#9829; Gespeicherte</button>
+            </div>
+            <div class="filter-count" id="hike-count">10 Routen</div>
+        </div>
+
+        <!-- Wanderrouten -->
+        <section id="hike-list">
+            
+            <article class="hike-card"
+                     data-difficulty="Leicht"
+                     data-canton="AR"
+                     data-duration="2to4h"
+                     data-distance="5to15km"
+                     data-id="hike-schweizmobil-fallback-904">
+                <div class="hike-card-img-wrapper">
+                    <button class="save-btn" data-save-id="hike-schweizmobil-fallback-904" title="Speichern">&#9825;</button>
+                    
+                    <div class="hike-card-img-placeholder">&#9968;</div>
+                    
+                </div>
+                <div class="hike-card-body">
+                    <h3 class="hike-card-title">Appenzeller Witzweg</h3>
+                    <div class="hike-stats">
+                        <span class="difficulty-badge diff-leicht">Leicht</span>
+                        <span>&#9201; 2h</span>
+                        <span>&#128205; 6.5 km</span>
+                        
+                        <span>&uarr; 180m</span>
+                        
+                        
+                        <span>&darr; 180m</span>
+                        
+                    </div>
+                    <div class="hike-stats">
+                        <span>Ostschweiz &middot; AR</span>
+                    </div>
+                    
+                    <p class="hike-card-desc">Humorvoller Themenweg durch das Appenzeller Vorderland mit Witzen auf Tafeln und Bodenseepanorama.</p>
+                    
+                    <div class="hike-card-links">
+                        <a href="https://www.schweizmobil.ch/de/wanderland/route-904" target="_blank" rel="noopener">Route ansehen &rarr;</a>
+                        
+                    </div>
+                </div>
+            </article>
+            
+            <article class="hike-card"
+                     data-difficulty="Leicht"
+                     data-canton="BE"
+                     data-duration="lt2h"
+                     data-distance="lt5km"
+                     data-id="hike-schweizmobil-fallback-906">
+                <div class="hike-card-img-wrapper">
+                    <button class="save-btn" data-save-id="hike-schweizmobil-fallback-906" title="Speichern">&#9825;</button>
+                    
+                    <div class="hike-card-img-placeholder">&#9968;</div>
+                    
+                </div>
+                <div class="hike-card-body">
+                    <h3 class="hike-card-title">Blausee Rundwanderung</h3>
+                    <div class="hike-stats">
+                        <span class="difficulty-badge diff-leicht">Leicht</span>
+                        <span>&#9201; 1h</span>
+                        <span>&#128205; 3.0 km</span>
+                        
+                        <span>&uarr; 50m</span>
+                        
+                        
+                        <span>&darr; 50m</span>
+                        
+                    </div>
+                    <div class="hike-stats">
+                        <span>Berner Oberland &middot; BE</span>
+                    </div>
+                    
+                    <p class="hike-card-desc">Kurzer Spaziergang um den kristallklaren Blausee im Kandertal, ideal für Familien.</p>
+                    
+                    <div class="hike-card-links">
+                        <a href="https://www.schweizmobil.ch/de/wanderland/route-906" target="_blank" rel="noopener">Route ansehen &rarr;</a>
+                        
+                    </div>
+                </div>
+            </article>
+            
+            <article class="hike-card"
+                     data-difficulty="Leicht"
+                     data-canton="VD"
+                     data-duration="2to4h"
+                     data-distance="5to15km"
+                     data-id="hike-schweizmobil-fallback-101">
+                <div class="hike-card-img-wrapper">
+                    <button class="save-btn" data-save-id="hike-schweizmobil-fallback-101" title="Speichern">&#9825;</button>
+                    
+                    <div class="hike-card-img-placeholder">&#9968;</div>
+                    
+                </div>
+                <div class="hike-card-body">
+                    <h3 class="hike-card-title">Chemin des Vignobles – Lavaux</h3>
+                    <div class="hike-stats">
+                        <span class="difficulty-badge diff-leicht">Leicht</span>
+                        <span>&#9201; 2h30</span>
+                        <span>&#128205; 11.0 km</span>
+                        
+                        <span>&uarr; 300m</span>
+                        
+                        
+                        <span>&darr; 300m</span>
+                        
+                    </div>
+                    <div class="hike-stats">
+                        <span>Genferseegebiet &middot; VD</span>
+                    </div>
+                    
+                    <p class="hike-card-desc">Genusswanderung durch die UNESCO-geschützten Weinberg-Terrassen von Lavaux am Genfersee.</p>
+                    
+                    <div class="hike-card-links">
+                        <a href="https://www.schweizmobil.ch/de/wanderland/route-101" target="_blank" rel="noopener">Route ansehen &rarr;</a>
+                        
+                    </div>
+                </div>
+            </article>
+            
+            <article class="hike-card"
+                     data-difficulty="Leicht"
+                     data-canton="TI"
+                     data-duration="2to4h"
+                     data-distance="5to15km"
+                     data-id="hike-schweizmobil-fallback-655">
+                <div class="hike-card-img-wrapper">
+                    <button class="save-btn" data-save-id="hike-schweizmobil-fallback-655" title="Speichern">&#9825;</button>
+                    
+                    <div class="hike-card-img-placeholder">&#9968;</div>
+                    
+                </div>
+                <div class="hike-card-body">
+                    <h3 class="hike-card-title">Monte San Giorgio Rundweg</h3>
+                    <div class="hike-stats">
+                        <span class="difficulty-badge diff-leicht">Leicht</span>
+                        <span>&#9201; 4h</span>
+                        <span>&#128205; 11.0 km</span>
+                        
+                        <span>&uarr; 650m</span>
+                        
+                        
+                        <span>&darr; 650m</span>
+                        
+                    </div>
+                    <div class="hike-stats">
+                        <span>Tessin &middot; TI</span>
+                    </div>
+                    
+                    <p class="hike-card-desc">Rundwanderung auf dem UNESCO-Welterbe Monte San Giorgio mit Fossilienfundstellen und Luganer See-Panorama.</p>
+                    
+                    <div class="hike-card-links">
+                        <a href="https://www.schweizmobil.ch/de/wanderland/route-655" target="_blank" rel="noopener">Route ansehen &rarr;</a>
+                        
+                    </div>
+                </div>
+            </article>
+            
+            <article class="hike-card"
+                     data-difficulty="Leicht"
+                     data-canton="BE"
+                     data-duration="gt4h"
+                     data-distance="5to15km"
+                     data-id="hike-schweizmobil-fallback-905">
+                <div class="hike-card-img-wrapper">
+                    <button class="save-btn" data-save-id="hike-schweizmobil-fallback-905" title="Speichern">&#9825;</button>
+                    
+                    <div class="hike-card-img-placeholder">&#9968;</div>
+                    
+                </div>
+                <div class="hike-card-body">
+                    <h3 class="hike-card-title">Niesen – Treppe zum Himmel</h3>
+                    <div class="hike-stats">
+                        <span class="difficulty-badge diff-leicht">Leicht</span>
+                        <span>&#9201; 4h30</span>
+                        <span>&#128205; 7.0 km</span>
+                        
+                        <span>&uarr; 1600m</span>
+                        
+                        
+                        <span>&darr; 200m</span>
+                        
+                    </div>
+                    <div class="hike-stats">
+                        <span>Berner Oberland &middot; BE</span>
+                    </div>
+                    
+                    <p class="hike-card-desc">Aufstieg zum Niesen über die längste Treppe der Welt (11'674 Stufen) mit Thunersee-Panorama.</p>
+                    
+                    <div class="hike-card-links">
+                        <a href="https://www.schweizmobil.ch/de/wanderland/route-905" target="_blank" rel="noopener">Route ansehen &rarr;</a>
+                        
+                    </div>
+                </div>
+            </article>
+            
+            <article class="hike-card"
+                     data-difficulty="Leicht"
+                     data-canton="LU"
+                     data-duration="2to4h"
+                     data-distance="5to15km"
+                     data-id="hike-schweizmobil-fallback-902">
+                <div class="hike-card-img-wrapper">
+                    <button class="save-btn" data-save-id="hike-schweizmobil-fallback-902" title="Speichern">&#9825;</button>
+                    
+                    <div class="hike-card-img-placeholder">&#9968;</div>
+                    
+                </div>
+                <div class="hike-card-body">
+                    <h3 class="hike-card-title">Pilatus Rundweg – Goldene Rundfahrt</h3>
+                    <div class="hike-stats">
+                        <span class="difficulty-badge diff-leicht">Leicht</span>
+                        <span>&#9201; 3h</span>
+                        <span>&#128205; 8.5 km</span>
+                        
+                        <span>&uarr; 450m</span>
+                        
+                        
+                        <span>&darr; 450m</span>
+                        
+                    </div>
+                    <div class="hike-stats">
+                        <span>Zentralschweiz &middot; LU</span>
+                    </div>
+                    
+                    <p class="hike-card-desc">Rundwanderung auf dem Pilatus mit atemberaubendem 360°-Panorama über die Zentralschweizer Alpen.</p>
+                    
+                    <div class="hike-card-links">
+                        <a href="https://www.schweizmobil.ch/de/wanderland/route-902" target="_blank" rel="noopener">Route ansehen &rarr;</a>
+                        
+                    </div>
+                </div>
+            </article>
+            
+            <article class="hike-card"
+                     data-difficulty="Leicht"
+                     data-canton="SZ"
+                     data-duration="2to4h"
+                     data-distance="5to15km"
+                     data-id="hike-schweizmobil-fallback-903">
+                <div class="hike-card-img-wrapper">
+                    <button class="save-btn" data-save-id="hike-schweizmobil-fallback-903" title="Speichern">&#9825;</button>
+                    
+                    <div class="hike-card-img-placeholder">&#9968;</div>
+                    
+                </div>
+                <div class="hike-card-body">
+                    <h3 class="hike-card-title">Rigi Scheidegg – Rigi Kulm</h3>
+                    <div class="hike-stats">
+                        <span class="difficulty-badge diff-leicht">Leicht</span>
+                        <span>&#9201; 2h30</span>
+                        <span>&#128205; 6.0 km</span>
+                        
+                        <span>&uarr; 350m</span>
+                        
+                        
+                        <span>&darr; 200m</span>
+                        
+                    </div>
+                    <div class="hike-stats">
+                        <span>Zentralschweiz &middot; SZ</span>
+                    </div>
+                    
+                    <p class="hike-card-desc">Klassische Höhenwanderung auf der Königin der Berge mit Blick auf Vierwaldstättersee und Alpen.</p>
+                    
+                    <div class="hike-card-links">
+                        <a href="https://www.schweizmobil.ch/de/wanderland/route-903" target="_blank" rel="noopener">Route ansehen &rarr;</a>
+                        
+                    </div>
+                </div>
+            </article>
+            
+            <article class="hike-card"
+                     data-difficulty="Mittel"
+                     data-canton="BE"
+                     data-duration="gt4h"
+                     data-distance="gt15km"
+                     data-id="hike-schweizmobil-fallback-38">
+                <div class="hike-card-img-wrapper">
+                    <button class="save-btn" data-save-id="hike-schweizmobil-fallback-38" title="Speichern">&#9825;</button>
+                    
+                    <div class="hike-card-img-placeholder">&#9968;</div>
+                    
+                </div>
+                <div class="hike-card-body">
+                    <h3 class="hike-card-title">Schynige Platte – First</h3>
+                    <div class="hike-stats">
+                        <span class="difficulty-badge diff-mittel">Mittel</span>
+                        <span>&#9201; 6h30</span>
+                        <span>&#128205; 16.5 km</span>
+                        
+                        <span>&uarr; 1050m</span>
+                        
+                        
+                        <span>&darr; 850m</span>
+                        
+                    </div>
+                    <div class="hike-stats">
+                        <span>Berner Oberland &middot; BE</span>
+                    </div>
+                    
+                    <p class="hike-card-desc">Alpine Gratwanderung mit grandiosem Panorama auf Eiger, Mönch und Jungfrau über den Faulhornweg.</p>
+                    
+                    <div class="hike-card-links">
+                        <a href="https://www.schweizmobil.ch/de/wanderland/route-38" target="_blank" rel="noopener">Route ansehen &rarr;</a>
+                        
+                    </div>
+                </div>
+            </article>
+            
+            <article class="hike-card"
+                     data-difficulty="Leicht"
+                     data-canton="GR"
+                     data-duration="2to4h"
+                     data-distance="5to15km"
+                     data-id="hike-schweizmobil-fallback-44">
+                <div class="hike-card-img-wrapper">
+                    <button class="save-btn" data-save-id="hike-schweizmobil-fallback-44" title="Speichern">&#9825;</button>
+                    
+                    <div class="hike-card-img-placeholder">&#9968;</div>
+                    
+                </div>
+                <div class="hike-card-body">
+                    <h3 class="hike-card-title">Sentiero Graubünden Etappe Soglio</h3>
+                    <div class="hike-stats">
+                        <span class="difficulty-badge diff-leicht">Leicht</span>
+                        <span>&#9201; 3h30</span>
+                        <span>&#128205; 10.0 km</span>
+                        
+                        <span>&uarr; 500m</span>
+                        
+                        
+                        <span>&darr; 600m</span>
+                        
+                    </div>
+                    <div class="hike-stats">
+                        <span>Graubünden &middot; GR</span>
+                    </div>
+                    
+                    <p class="hike-card-desc">Wanderung vom schönsten Dorf der Schweiz durch Kastanienwälder ins Bergell mit Blick auf die Sciora-Gruppe.</p>
+                    
+                    <div class="hike-card-links">
+                        <a href="https://www.schweizmobil.ch/de/wanderland/route-44" target="_blank" rel="noopener">Route ansehen &rarr;</a>
+                        
+                    </div>
+                </div>
+            </article>
+            
+            <article class="hike-card"
+                     data-difficulty="Leicht"
+                     data-canton="TI"
+                     data-duration="gt4h"
+                     data-distance="gt15km"
+                     data-id="hike-schweizmobil-fallback-907">
+                <div class="hike-card-img-wrapper">
+                    <button class="save-btn" data-save-id="hike-schweizmobil-fallback-907" title="Speichern">&#9825;</button>
+                    
+                    <div class="hike-card-img-placeholder">&#9968;</div>
+                    
+                </div>
+                <div class="hike-card-body">
+                    <h3 class="hike-card-title">Strada Alta – Leventina Höhenweg</h3>
+                    <div class="hike-stats">
+                        <span class="difficulty-badge diff-leicht">Leicht</span>
+                        <span>&#9201; 5h</span>
+                        <span>&#128205; 18.0 km</span>
+                        
+                        <span>&uarr; 600m</span>
+                        
+                        
+                        <span>&darr; 800m</span>
+                        
+                    </div>
+                    <div class="hike-stats">
+                        <span>Tessin &middot; TI</span>
+                    </div>
+                    
+                    <p class="hike-card-desc">Historischer Höhenweg durch das Leventinatal mit traditionellen Tessiner Dörfern und Kastanienwäldern.</p>
+                    
+                    <div class="hike-card-links">
+                        <a href="https://www.schweizmobil.ch/de/wanderland/route-907" target="_blank" rel="noopener">Route ansehen &rarr;</a>
+                        
+                    </div>
+                </div>
+            </article>
+            
+        </section>
+
+        <div class="no-results" id="no-hikes">Keine Wanderungen mit diesen Filtern gefunden.</div>
+
+        </div><!-- /tab-hikes -->
+
+        <!-- Favoriten Tab -->
+        <div class="tab-content" id="tab-favorites">
+            <div class="fav-empty" id="fav-empty">
+                <p style="text-align:center; padding: 3rem 1rem; color: #888; font-size: 1.1rem;">
+                    Noch keine Favoriten gespeichert.<br>
+                    Klicke auf das &#9825; bei Events oder Wanderrouten, um sie hier zu sammeln.
+                </p>
+            </div>
+            <section id="fav-events" style="display:none;">
+                <h2 style="margin: 1.5rem 0 1rem;">Gespeicherte Events</h2>
+                <div class="event-grid" id="fav-events-grid"></div>
+            </section>
+            <section id="fav-hikes" style="display:none;">
+                <h2 style="margin: 1.5rem 0 1rem;">Gespeicherte Wanderrouten</h2>
+                <div id="fav-hikes-list"></div>
+            </section>
+        </div><!-- /tab-favorites -->
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>Datenquellen: Eventfrog.ch &middot; SchweizMobil</p>
+            <p>Automatisch generiert am 21.03.2026 um 12:07 Uhr</p>
+            
+            <p class="sources-failed">&#9888; Nicht erreichbar: Komoot</p>
+            
+        </div>
+    </footer>
+
+    <script>
+    (function() {
+        // Tab switching
+        document.querySelectorAll('.main-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // Favorites — speichert komplette Kartendaten
+        // Fallback auf in-memory wenn localStorage nicht funktioniert (file://)
+        const STORAGE_KEY = 'weekend-events-saved';
+        let _savedMap = {};
+        // Lade gespeicherte Daten beim Start
+        try {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) _savedMap = JSON.parse(stored);
+            // Prüfe ob localStorage wirklich funktioniert (write + read-back)
+            localStorage.setItem('__ls_test__', 'ok');
+            if (localStorage.getItem('__ls_test__') === 'ok') {
+                localStorage.removeItem('__ls_test__');
+            }
+        } catch(e) {}
+        function getSavedMap() {
+            return _savedMap;
+        }
+        function setSavedMap(map) {
+            _savedMap = map;
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(map)); } catch(e) {}
+        }
+        function getSavedIds() {
+            return Object.keys(_savedMap);
+        }
+
+        // Extrahiere Kartendaten aus dem DOM
+        function extractCardData(card, id) {
+            const type = id.startsWith('event-') ? 'event' : 'hike';
+            if (type === 'event') {
+                const titleEl = card.querySelector('.event-card-title');
+                const metaEl = card.querySelector('.event-card-meta');
+                const priceEl = card.querySelector('.event-card-price');
+                const linkEl = card.querySelector('.event-card-link');
+                const imgEl = card.querySelector('.event-card-img');
+                return {
+                    type: 'event',
+                    title: titleEl ? titleEl.textContent.trim() : '',
+                    meta: metaEl ? metaEl.innerHTML : '',
+                    price: priceEl ? priceEl.outerHTML : '',
+                    link: linkEl ? linkEl.href : '',
+                    image: imgEl ? imgEl.src : null,
+                    category: card.dataset.category || 'Sonstiges',
+                    day: card.dataset.day || '',
+                    canton: card.dataset.canton || '',
+                    priceType: card.dataset.price || 'paid',
+                };
+            } else {
+                return {
+                    type: 'hike',
+                    html: card.outerHTML,
+                    difficulty: card.dataset.difficulty || '',
+                    canton: card.dataset.canton || '',
+                    duration: card.dataset.duration || '',
+                    distance: card.dataset.distance || '',
+                };
+            }
+        }
+
+        // Rendere eine gespeicherte Event-Karte
+        function renderSavedEventCard(id, data) {
+            const card = document.createElement('article');
+            card.className = 'event-card';
+            card.dataset.category = data.category;
+            card.dataset.day = data.day;
+            card.dataset.canton = data.canton;
+            card.dataset.price = data.priceType;
+            card.dataset.id = id;
+            card.innerHTML = `
+                <div class="event-card-img-wrapper">
+                    <button class="save-btn saved" data-save-id="${id}" title="Speichern">&#9829;</button>
+                    ${data.image
+                        ? `<img class="event-card-img" src="${data.image}" alt="${data.title}" loading="lazy">`
+                        : '<div class="event-card-img-placeholder">&#127915;</div>'}
+                </div>
+                <div class="event-card-body">
+                    <h3 class="event-card-title">${data.title}</h3>
+                    <div class="event-card-meta">${data.meta}</div>
+                    ${data.price}
+                    <br><a class="event-card-link" href="${data.link}" target="_blank" rel="noopener">Details &rarr;</a>
+                </div>`;
+            return card;
+        }
+
+        // Rendere eine gespeicherte Hike-Karte aus gespeichertem HTML
+        function renderSavedHikeCard(id, data) {
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = data.html;
+            const card = wrapper.firstElementChild;
+            // Sicherstellen dass der Save-Button gesetzt ist
+            const btn = card.querySelector('.save-btn');
+            if (btn) { btn.classList.add('saved'); btn.innerHTML = '&#9829;'; }
+            return card;
+        }
+
+        // Injiziere gespeicherte Karten die nicht mehr auf der Seite sind
+        function injectMissingSaved() {
+            const savedMap = getSavedMap();
+            const pageIds = new Set();
+            document.querySelectorAll('[data-id]').forEach(el => pageIds.add(el.dataset.id));
+
+            let injectedEvents = 0, injectedHikes = 0;
+
+            for (const [id, data] of Object.entries(savedMap)) {
+                if (pageIds.has(id)) continue; // schon auf der Seite
+
+                if (data.type === 'event') {
+                    // In "Sonstiges" Sektion einfügen oder eigene Sektion erstellen
+                    let targetSection = document.querySelector('.event-section[data-category="' + data.category + '"]');
+                    if (!targetSection) {
+                        targetSection = document.querySelector('.event-section:last-of-type');
+                    }
+                    if (targetSection) {
+                        const grid = targetSection.querySelector('.event-grid');
+                        if (grid) {
+                            grid.appendChild(renderSavedEventCard(id, data));
+                            injectedEvents++;
+                        }
+                    }
+                } else if (data.type === 'hike') {
+                    const hikeList = document.getElementById('hike-list');
+                    if (hikeList) {
+                        hikeList.appendChild(renderSavedHikeCard(id, data));
+                        injectedHikes++;
+                    }
+                }
+            }
+
+            // Re-bind save buttons für injizierte Karten
+            if (injectedEvents + injectedHikes > 0) {
+                bindSaveButtons();
+            }
+        }
+
+        function toggleSave(id, card) {
+            const savedMap = getSavedMap();
+            let nowSaved;
+            if (savedMap[id]) {
+                delete savedMap[id];
+                nowSaved = false;
+            } else {
+                savedMap[id] = extractCardData(card, id);
+                nowSaved = true;
+            }
+            setSavedMap(savedMap);
+            refreshFavoritesTab();
+            return nowSaved;
+        }
+
+        // Favoriten-Tab aktualisieren
+        function refreshFavoritesTab() {
+            const savedMap = getSavedMap();
+            const ids = Object.keys(savedMap);
+            const events = ids.filter(id => id.startsWith('event-'));
+            const hikes = ids.filter(id => id.startsWith('hike-'));
+
+            // Counter im Tab aktualisieren
+            document.getElementById('fav-count').textContent = '(' + ids.length + ')';
+
+            // Leer-Nachricht
+            document.getElementById('fav-empty').style.display = ids.length === 0 ? '' : 'none';
+
+            // Events-Sektion
+            const favEventsSection = document.getElementById('fav-events');
+            const favEventsGrid = document.getElementById('fav-events-grid');
+            favEventsGrid.innerHTML = '';
+            if (events.length > 0) {
+                favEventsSection.style.display = '';
+                events.forEach(id => {
+                    const data = savedMap[id];
+                    const card = renderSavedEventCard(id, data);
+                    // Save-Button in Favoriten-Tab: Entfernen statt Toggle
+                    const btn = card.querySelector('.save-btn');
+                    if (btn) {
+                        btn.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const map = getSavedMap();
+                            delete map[id];
+                            setSavedMap(map);
+                            // Auch im Events-Tab den Button aktualisieren
+                            const origBtn = document.querySelector('#tab-events .save-btn[data-save-id="' + id + '"]');
+                            if (origBtn) { origBtn.classList.remove('saved'); origBtn.innerHTML = '&#9825;'; }
+                            refreshFavoritesTab();
+                        });
+                    }
+                    favEventsGrid.appendChild(card);
+                });
+            } else {
+                favEventsSection.style.display = 'none';
+            }
+
+            // Hikes-Sektion
+            const favHikesSection = document.getElementById('fav-hikes');
+            const favHikesList = document.getElementById('fav-hikes-list');
+            favHikesList.innerHTML = '';
+            if (hikes.length > 0) {
+                favHikesSection.style.display = '';
+                hikes.forEach(id => {
+                    const data = savedMap[id];
+                    const card = renderSavedHikeCard(id, data);
+                    // Save-Button in Favoriten-Tab: Entfernen statt Toggle
+                    const btn = card.querySelector('.save-btn');
+                    if (btn) {
+                        const newBtn = btn.cloneNode(true);
+                        btn.parentNode.replaceChild(newBtn, btn);
+                        newBtn.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const map = getSavedMap();
+                            delete map[id];
+                            setSavedMap(map);
+                            const origBtn = document.querySelector('#tab-hikes .save-btn[data-save-id="' + id + '"]');
+                            if (origBtn) { origBtn.classList.remove('saved'); origBtn.innerHTML = '&#9825;'; }
+                            refreshFavoritesTab();
+                        });
+                    }
+                    favHikesList.appendChild(card);
+                });
+            } else {
+                favHikesSection.style.display = 'none';
+            }
+        }
+
+        function bindSaveButtons() {
+            const savedIds = getSavedIds();
+            document.querySelectorAll('#tab-events .save-btn, #tab-hikes .save-btn').forEach(btn => {
+                const id = btn.dataset.saveId;
+                if (savedIds.includes(id)) {
+                    btn.classList.add('saved');
+                    btn.innerHTML = '&#9829;';
+                }
+                // Entferne alte Listener durch Klonen
+                const newBtn = btn.cloneNode(true);
+                btn.parentNode.replaceChild(newBtn, btn);
+                newBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const card = newBtn.closest('.event-card, .hike-card');
+                    const nowSaved = toggleSave(id, card);
+                    newBtn.classList.toggle('saved', nowSaved);
+                    newBtn.innerHTML = nowSaved ? '&#9829;' : '&#9825;';
+                    if (activeFilters['event-saved'] === 'saved') applyEventFilters();
+                    if (activeFilters['hike-saved'] === 'saved') applyHikeFilters();
+                });
+            });
+        }
+
+        // Init
+        injectMissingSaved();
+        bindSaveButtons();
+        refreshFavoritesTab();
+
+        const activeFilters = {};
+
+        function setFilter(filterName, value) {
+            activeFilters[filterName] = value;
+        }
+
+        function applyEventFilters() {
+            const cards = document.querySelectorAll('.event-card');
+            const currentSaved = getSavedIds();
+            let visible = 0;
+            cards.forEach(card => {
+                const catMatch = !activeFilters['event-category'] || activeFilters['event-category'] === 'all' || card.dataset.category === activeFilters['event-category'];
+                const dayMatch = !activeFilters['event-day'] || activeFilters['event-day'] === 'all' || card.dataset.day === activeFilters['event-day'];
+                const cantonMatch = !activeFilters['event-canton'] || activeFilters['event-canton'] === 'all' || card.dataset.canton === activeFilters['event-canton'];
+                const priceMatch = !activeFilters['event-price'] || activeFilters['event-price'] === 'all' || card.dataset.price === activeFilters['event-price'];
+                const savedMatch = !activeFilters['event-saved'] || activeFilters['event-saved'] !== 'saved' || currentSaved.includes(card.dataset.id);
+                const show = catMatch && dayMatch && cantonMatch && priceMatch && savedMatch;
+                card.style.display = show ? '' : 'none';
+                if (show) visible++;
+            });
+
+            // Section visibility
+            document.querySelectorAll('.event-section').forEach(section => {
+                const visibleCards = section.querySelectorAll('.event-card:not([style*="display: none"])');
+                section.style.display = visibleCards.length ? '' : 'none';
+            });
+
+            document.getElementById('event-count').textContent = visible + ' Events';
+            document.getElementById('no-events').style.display = visible === 0 ? 'block' : 'none';
+        }
+
+        function applyHikeFilters() {
+            const cards = document.querySelectorAll('.hike-card');
+            const currentSaved = getSavedIds();
+            let visible = 0;
+            cards.forEach(card => {
+                const diffMatch = !activeFilters['hike-difficulty'] || activeFilters['hike-difficulty'] === 'all' || card.dataset.difficulty === activeFilters['hike-difficulty'];
+                const cantonMatch = !activeFilters['hike-canton'] || activeFilters['hike-canton'] === 'all' || card.dataset.canton === activeFilters['hike-canton'];
+                const durMatch = !activeFilters['hike-duration'] || activeFilters['hike-duration'] === 'all' || card.dataset.duration === activeFilters['hike-duration'];
+                const distMatch = !activeFilters['hike-distance'] || activeFilters['hike-distance'] === 'all' || card.dataset.distance === activeFilters['hike-distance'];
+                const savedMatch = !activeFilters['hike-saved'] || activeFilters['hike-saved'] !== 'saved' || currentSaved.includes(card.dataset.id);
+                const show = diffMatch && cantonMatch && durMatch && distMatch && savedMatch;
+                card.style.display = show ? '' : 'none';
+                if (show) visible++;
+            });
+
+            document.getElementById('hike-count').textContent = visible + ' Routen';
+            document.getElementById('no-hikes').style.display = visible === 0 ? 'block' : 'none';
+        }
+
+        // Button filters
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const filterName = btn.dataset.filter;
+
+                // "Gespeicherte" is a toggle, not a radio group
+                if (filterName.endsWith('-saved')) {
+                    const isActive = btn.classList.toggle('saved-filter-btn');
+                    setFilter(filterName, isActive ? 'saved' : 'all');
+                } else {
+                    // Deactivate siblings
+                    btn.closest('.filter-group').querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    setFilter(filterName, btn.dataset.value);
+                }
+
+                if (filterName.startsWith('event-')) applyEventFilters();
+                else applyHikeFilters();
+            });
+        });
+
+        // Select filters
+        document.querySelectorAll('.filter-select').forEach(sel => {
+            sel.addEventListener('change', () => {
+                setFilter(sel.dataset.filter, sel.value);
+                if (sel.dataset.filter.startsWith('event-')) applyEventFilters();
+                else applyHikeFilters();
+            });
+        });
+    })();
+    </script>
+</body>
+</html>
