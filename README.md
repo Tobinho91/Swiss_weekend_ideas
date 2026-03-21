@@ -1,5 +1,7 @@
 # Swiss Weekend Ideas
 
+**[Live Site](https://tobinho91.github.io/Swiss_weekend_ideas/)**
+
 Weekend events and hiking routes in Switzerland — automatically aggregated into a single HTML page every Thursday.
 
 ## What it does
