@@ -555,38 +555,13 @@
                      data-duration="{{ hike.duration_bucket }}"
                      data-distance="{{ hike.distance_bucket }}"
                      data-id="hike-{{ hike.external_id or loop.index }}">
-                <div class="hike-card-img-wrapper">
-                    <button class="save-btn" data-save-id="hike-{{ hike.external_id or loop.index }}" title="Speichern">&#9825;</button>
-                    {% if hike.image_url %}
-                    <img class="hike-card-img" src="{{ hike.image_url }}" alt="{{ hike.title }}" loading="lazy">
-                    {% else %}
-                    <div class="hike-card-img-placeholder">&#9968;</div>
-                    {% endif %}
-                </div>
                 <div class="hike-card-body">
                     <h3 class="hike-card-title">{{ hike.title }}</h3>
                     <div class="hike-stats">
-                        <span class="difficulty-badge diff-{{ hike.difficulty|lower|replace(' ', '-') }}">{{ hike.difficulty }}</span>
-                        <span>&#9201; {{ hike.duration_label }}</span>
-                        <span>&#128205; {{ '%.1f'|format(hike.distance_km) }} km</span>
-                        {% if hike.elevation_gain_m %}
-                        <span>&uarr; {{ hike.elevation_gain_m }}m</span>
-                        {% endif %}
-                        {% if hike.elevation_loss_m %}
-                        <span>&darr; {{ hike.elevation_loss_m }}m</span>
-                        {% endif %}
+                        <span>📍 {{ hike.region }} &middot; {{ hike.canton }}</span>
                     </div>
-                    <div class="hike-stats">
-                        <span>{{ hike.region }} &middot; {{ hike.canton }}</span>
-                    </div>
-                    {% if hike.description %}
-                    <p class="hike-card-desc">{{ hike.description }}</p>
-                    {% endif %}
-                    <div class="hike-card-links">
-                        <a href="{{ hike.source_url }}" target="_blank" rel="noopener">Route ansehen &rarr;</a>
-                        {% if hike.gpx_url %}
-                        <a href="{{ hike.gpx_url }}" download>GPX herunterladen</a>
-                        {% endif %}
+                    <div class="hike-card-links" style="margin-top: 1rem;">
+                        <a href="{{ hike.source_url }}" target="_blank" rel="noopener">Auf Schweizmobil ansehen &rarr;</a>
                     </div>
                 </div>
             </article>
