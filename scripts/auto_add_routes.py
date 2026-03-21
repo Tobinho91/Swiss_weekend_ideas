@@ -231,13 +231,13 @@ def add_routes_to_file(num_routes: int = 10) -> bool:
         file_path = Path("scrapers/hiking/schweizmobil.py")
         content = file_path.read_text(encoding="utf-8")
 
-        # Find the last external_id to continue the numbering
-        match = re.search(r'external_id="schweizmobil-fallback-(\d+)"', content)
-        if not match:
-            print("❌ Could not find existing routes in file")
+        # Find the highest external_id to continue the numbering
+        matches = re.findall(r'external_id="schweizmobil-fallback-(\d+)"', content)
+        if not matches:
+            print("[ERROR] Could not find existing routes in file")
             return False
 
-        last_id = int(match.group(1))
+        last_id = max(int(m) for m in matches)
         next_id = last_id + 1
 
         # Filter out routes that have already been added (no duplicates)
@@ -248,7 +248,7 @@ def add_routes_to_file(num_routes: int = 10) -> bool:
         ]
 
         if not available_candidates:
-            print("⚠️  All candidate routes have already been added!")
+            print("[WARN] All candidate routes have already been added!")
             return False
 
         # Select random routes from available candidates
@@ -262,23 +262,29 @@ def add_routes_to_file(num_routes: int = 10) -> bool:
             generate_hike_code(route, next_id + i) for i, route in enumerate(selected)
         )
 
-        # Find insertion point: before the closing `]` bracket in _all_curated_routes
-        insertion_pattern = r'(            ),\n        \]'
+        # Find insertion point: last route's closing paren before the `]` bracket
+        insertion_pattern = r'(\),)\n(\s+)\]'
         if not re.search(insertion_pattern, content):
-            print("❌ Could not find insertion point in file")
+            print("[ERROR] Could not find insertion point in file")
             return False
 
-        # Insert the new routes
+        # Insert the new routes, preserving the last route's closing paren and indentation
+        def replacement(match):
+            closing_paren = match.group(1)  # `)`,
+            indent = match.group(2)         # whitespace
+            return f'{closing_paren}\n{new_routes_code}\n{indent}]'
+
         new_content = re.sub(
-            r'(            ),\n        \]',
-            f'{new_routes_code}\n        ]',
-            content
+            insertion_pattern,
+            replacement,
+            content,
+            count=1  # Only replace the last occurrence (safest)
         )
 
         # Write back to file
         file_path.write_text(new_content, encoding="utf-8")
 
-        print(f"✅ Added {len(selected)} new hiking routes")
+        print(f"[OK] Added {len(selected)} new hiking routes")
         print(f"   Route IDs: {next_id} - {next_id + len(selected) - 1}")
         print(f"   Routes added:")
         for i, route in enumerate(selected, 1):
@@ -287,7 +293,7 @@ def add_routes_to_file(num_routes: int = 10) -> bool:
         return True
 
     except Exception as e:
-        print(f"❌ Error adding routes: {e}")
+        print(f"[ERROR] Error adding routes: {e}")
         return False
 
 
