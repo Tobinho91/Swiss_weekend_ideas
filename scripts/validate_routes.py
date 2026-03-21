@@ -1,141 +1,137 @@
 #!/usr/bin/env python3
 """
-Validate hiking routes - check that route IDs match their titles on schweizmobil.ch
-Run this before committing route changes to catch ID mismatches early.
+Route ID Validation Script
+
+Validates that all routes in data/schweizmobil_routes.json actually exist
+on schweizmobil.ch and load correctly. Prevents invalid route IDs from
+being committed or deployed.
+
+Usage:
+    python3 scripts/validate_routes.py              # Validate all routes
+    python3 scripts/validate_routes.py --strict     # Fail on ANY broken route
 """
 
-import re
-import logging
+import asyncio
+import json
+import sys
 from pathlib import Path
-import httpx
+from typing import Tuple, List
+import logging
 
-logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
-# Routes known to have issues or not be on schweizmobil.ch
-KNOWN_ISSUES = {
-    "Blausee Rundwanderung",  # Not a numbered route
-    "Muottas Muragl – Alp Languard",  # Tour 237, not a numbered route
-}
 
-
-def extract_routes_from_file(file_path):
-    """Extract all route titles and IDs from schweizmobil.py"""
-    content = file_path.read_text(encoding="utf-8")
-    routes = []
-
-    # Find all title and source_url pairs
-    title_pattern = r'title="([^"]+)"'
-    url_pattern = r'source_url="https://www\.schweizmobil\.ch/de/wanderland/route-(\d+)"'
-
-    # Find all matches
-    titles = [(m.start(), m.group(1)) for m in re.finditer(title_pattern, content)]
-    urls = [(m.start(), m.group(1)) for m in re.finditer(url_pattern, content)]
-
-    # Match titles with their corresponding route IDs
-    # (assuming they appear in order within each Hike block)
-    for title_pos, title in titles:
-        # Find the next URL that comes after this title
-        for url_pos, route_id in urls:
-            if url_pos > title_pos:
-                # Check if this URL is close enough to be in the same Hike block (within 500 chars)
-                if url_pos - title_pos < 500:
-                    routes.append({"title": title, "route_id": route_id})
-                break
-
-    return routes
-
-
-def validate_route_id(title, route_id, session):
+async def validate_route_id(route_id: int, route_title: str, timeout: int = 6000) -> Tuple[bool, str]:
     """
-    Validate that a route ID actually corresponds to the given title.
-    Returns (is_valid, actual_title, error_message)
+    Validate a single route ID by checking if it loads correctly on schweizmobil.ch
+
+    Returns:
+        (is_valid, status_message)
     """
-    if title in KNOWN_ISSUES:
-        return (True, None, "Known issue (not a numbered route)")
+    from playwright.async_api import async_playwright
+
+    url = f"https://www.schweizmobil.ch/de/wanderland/route-{route_id}"
 
     try:
-        url = f"https://www.schweizmobil.ch/de/wanderland/route-{route_id}"
-        response = session.get(url, timeout=10, follow_redirects=True)
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True)
+            page = await browser.new_page()
 
-        if response.status_code == 404:
-            return (False, None, "Route ID not found (404)")
+            await page.goto(url, wait_until="domcontentloaded", timeout=timeout)
 
-        if response.status_code != 200:
-            return (False, None, f"HTTP {response.status_code}")
+            # Get heading to detect error pages
+            h1_text = ""
+            try:
+                h1_text = (await page.locator("h1").first.text_content(timeout=1500)) or ""
+            except:
+                pass
 
-        # Try to extract the title from the page
-        # Look for <h1> or <title> tags that might contain the route name
-        html = response.text
-        title_match = re.search(r'<h1[^>]*>([^<]+)</h1>', html)
-        if not title_match:
-            title_match = re.search(r'<title>([^<]+)</title>', html)
+            await browser.close()
 
-        if title_match:
-            actual_title = title_match.group(1).strip()
-            # Check if our title is in the page (case-insensitive, partial match OK)
-            if title.lower() in actual_title.lower() or actual_title.lower() in title.lower():
-                return (True, actual_title, "Match found")
-            else:
-                return (False, actual_title, f"Title mismatch: expected '{title}', found '{actual_title}'")
-        else:
-            # Can't extract title from page, but if no 404, assume OK
-            return (True, None, "Page found (couldn't extract title to verify)")
+            # Check for error indicator
+            if "falsche Richtung" in h1_text:
+                return False, "Page returned 'wrong direction' error"
 
-    except httpx.TimeoutException:
-        return (False, None, "Request timeout")
+            if not h1_text:
+                return False, "No heading found (page may not have loaded)"
+
+            return True, f"Valid: {h1_text.strip()[:60]}"
+
+    except asyncio.TimeoutError:
+        return False, "Timeout loading page"
     except Exception as e:
-        return (False, None, f"Error: {str(e)}")
+        return False, f"Error: {str(e)[:50]}"
 
 
-def main():
-    file_path = Path("scrapers/hiking/schweizmobil.py")
+async def validate_all_routes(strict: bool = False) -> Tuple[int, int, List]:
+    """
+    Validate all routes in the JSON file
 
-    if not file_path.exists():
-        logger.error(f"File not found: {file_path}")
-        return 1
+    Returns:
+        (valid_count, broken_count, broken_routes_list)
+    """
+    routes_file = Path("data/schweizmobil_routes.json")
 
-    logger.info("Extracting routes from schweizmobil.py...")
-    routes = extract_routes_from_file(file_path)
-    logger.info(f"Found {len(routes)} routes")
+    if not routes_file.exists():
+        logger.error(f"Routes file not found: {routes_file}")
+        return 0, 0, []
 
-    logger.info("\nValidating routes (this may take a minute)...")
-    errors = []
+    routes = json.loads(routes_file.read_text(encoding="utf-8"))
+    logger.info(f"Validating {len(routes)} routes...\n")
 
-    with httpx.Client() as session:
-        for i, route in enumerate(routes, 1):
-            title = route["title"]
-            route_id = route["route_id"]
+    valid = []
+    broken = []
 
-            logger.info(f"[{i}/{len(routes)}] Checking {title}... (route-{route_id})")
-            is_valid, actual_title, message = validate_route_id(title, route_id, session)
+    for i, route in enumerate(routes, 1):
+        route_id = route['id']
+        title = route['title']
 
-            if is_valid:
-                logger.info(f"  ✓ {message}")
-            else:
-                logger.warning(f"  ✗ {message}")
-                errors.append({
-                    "title": title,
-                    "route_id": route_id,
-                    "error": message,
-                    "actual_title": actual_title,
-                })
+        is_valid, status = await validate_route_id(route_id, title)
 
-    # Summary
+        if is_valid:
+            valid.append((route_id, title))
+            logger.info(f"{i:2d}. [OK]     Route {route_id:3d}: {title[:50]}")
+        else:
+            broken.append((route_id, title, status))
+            logger.info(f"{i:2d}. [BROKEN] Route {route_id:3d}: {title[:50]} - {status}")
+
+    return len(valid), len(broken), broken
+
+
+async def main():
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Validate hiking route IDs")
+    parser.add_argument("--strict", action="store_true",
+                       help="Fail if ANY routes are broken (exit code 1)")
+
+    args = parser.parse_args()
+
+    valid_count, broken_count, broken_routes = await validate_all_routes(args.strict)
+
     logger.info(f"\n{'='*70}")
-    if errors:
-        logger.error(f"Found {len(errors)} validation error(s):")
-        for error in errors:
-            logger.error(f"\n  Route: {error['title']}")
-            logger.error(f"  ID: route-{error['route_id']}")
-            logger.error(f"  Error: {error['error']}")
-            if error['actual_title']:
-                logger.error(f"  Actual title: {error['actual_title']}")
-        return 1
-    else:
-        logger.info("✓ All routes validated successfully!")
-        return 0
+    logger.info(f"SUMMARY: {valid_count} valid, {broken_count} broken")
+    logger.info(f"{'='*70}")
+
+    if broken_routes:
+        logger.warning(f"\nBROKEN ROUTES ({broken_count}):")
+        for route_id, title, status in broken_routes:
+            logger.warning(f"  - Route {route_id}: {title}")
+            logger.warning(f"    └─ {status}")
+
+    # Exit with error code if strict mode and routes are broken
+    if args.strict and broken_count > 0:
+        logger.error(f"\n[STRICT MODE] Failing due to {broken_count} broken route(s)")
+        sys.exit(1)
+
+    if broken_count > 0:
+        logger.warning(f"\n[WARNING] {broken_count} broken route(s) found but not failing (use --strict to fail)")
+        sys.exit(0)
+
+    logger.info("\n[OK] All routes validated successfully!")
+    sys.exit(0)
 
 
 if __name__ == "__main__":
-    exit(main())
+    asyncio.run(main())

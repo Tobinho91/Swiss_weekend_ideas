@@ -1,0 +1,38 @@
+name: Validate Hiking Routes
+
+# Run on PRs and pushes to main to ensure routes are always valid
+on:
+  pull_request:
+    paths:
+      - 'data/schweizmobil_routes.json'
+      - 'scripts/validate_routes.py'
+  push:
+    branches: [main]
+    paths:
+      - 'data/schweizmobil_routes.json'
+
+jobs:
+  validate-routes:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install playwright
+          playwright install chromium
+
+      - name: Validate all routes
+        run: python3 scripts/validate_routes.py --strict
+
+      - name: Summary
+        run: |
+          echo "✅ All hiking routes validated successfully"
+          echo "All route IDs in data/schweizmobil_routes.json point to valid routes on schweizmobil.ch"

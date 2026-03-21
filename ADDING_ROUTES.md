@@ -100,6 +100,36 @@ GR = Graubünden    TG = Thurgau
 }
 ```
 
+## Validating Routes
+
+**CRITICAL: All route IDs must be valid on schweizmobil.ch before being added.**
+
+Validate routes before committing:
+
+```bash
+# Validate all routes (warns if broken, exits with 0)
+python3 scripts/validate_routes.py
+
+# Validate strictly (fails if ANY routes are broken)
+python3 scripts/validate_routes.py --strict
+```
+
+**What validation does:**
+- Tests each route ID by accessing https://www.schweizmobil.ch/de/wanderland/route-{ID}
+- Confirms the page loads correctly (not a 404 or error page)
+- Reports broken routes clearly
+
+**When adding new routes to ROUTES_CANDIDATES:**
+1. Test the route ID on schweizmobil.ch first
+2. Verify it loads and shows correct content
+3. Add to `ROUTES_CANDIDATES` in `scripts/auto_add_routes.py`
+4. Run `python3 scripts/validate_routes.py --strict` to verify
+
+**Validation in CI/CD:**
+- GitHub Actions automatically validates routes on every push to `main`
+- Pull requests are checked automatically
+- If validation fails, the workflow will stop and show which routes are broken
+
 ## Testing
 
 After adding routes, verify the website still works:
@@ -108,7 +138,7 @@ After adding routes, verify the website still works:
 python3 main.py
 ```
 
-Check that 10 random routes are displayed and each links to a correct schweizmobil.ch URL.
+Check that 10 random routes are displayed and each links to a valid schweizmobil.ch URL.
 
 ## Workflow Integration
 
