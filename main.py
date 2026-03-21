@@ -197,7 +197,7 @@ async def main():
     html = render_html(events_by_category, hikes, saturday, sunday, sources_used, sources_failed)
 
     OUTPUT_DIR.mkdir(exist_ok=True)
-    output_path = OUTPUT_DIR / "events_this_weekend.html"
+    output_path = OUTPUT_DIR / "index.html"
     output_path.write_text(html, encoding="utf-8")
     logger.info("HTML geschrieben: %s", output_path)
 
