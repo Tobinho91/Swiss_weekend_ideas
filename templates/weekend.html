@@ -619,7 +619,7 @@
     <footer>
         <div class="container">
             <p>Datenquellen: {{ sources_used|join(' &middot; ') }}</p>
-            <p>Automatisch generiert am {{ generated_at|de_date('%d.%m.%Y um %H:%M Uhr') }}</p>
+            <p>Zuletzt aktualisiert: {{ generated_at|de_date('%d.%m.%Y um %H:%M Uhr') }}</p>
             {% if sources_failed %}
             <p class="sources-failed">&#9888; Nicht erreichbar: {{ sources_failed|join(', ') }}</p>
             {% endif %}
