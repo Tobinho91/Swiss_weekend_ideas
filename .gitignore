@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Lokale Konfiguration
+.env
+
+# Generierter Output (wird von GitHub Actions verwaltet)
+output/
+
+# Claude Code local settings
+.claude/
+
+# Betriebssystem
+.DS_Store
+Thumbs.db

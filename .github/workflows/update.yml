@@ -1,0 +1,52 @@
+name: Wochenend-Events aktualisieren
+
+on:
+  schedule:
+    - cron: '0 17 * * 4'  # Jeden Donnerstag 17:00 UTC
+  workflow_dispatch:  # Manuell ausführbar
+
+jobs:
+  generate-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+
+      - name: Python einrichten
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Abhängigkeiten installieren
+        run: pip install -r requirements.txt
+
+      - name: Events und Wanderungen generieren
+        env:
+          EVENTFROG_API_KEY: ${{ secrets.EVENTFROG_API_KEY }}
+          MYSWITZERLAND_API_KEY: ${{ secrets.MYSWITZERLAND_API_KEY }}
+          OUTDOORACTIVE_API_KEY: ${{ secrets.OUTDOORACTIVE_API_KEY }}
+          KOMOOT_EMAIL: ${{ secrets.KOMOOT_EMAIL }}
+          KOMOOT_PASSWORD: ${{ secrets.KOMOOT_PASSWORD }}
+        run: python main.py
+
+      - name: Output prüfen
+        run: |
+          if [ ! -f output/events_this_weekend.html ]; then
+            echo "ERROR: HTML-Datei wurde nicht generiert!"
+            exit 1
+          fi
+          echo "HTML-Datei erfolgreich generiert."
+
+      - name: Auf GitHub Pages deployen
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./output
+          publish_branch: gh-pages
+          commit_message: "Update: Wochenend-Events"
+          user_name: github-actions[bot]
+          user_email: github-actions[bot]@users.noreply.github.com
