@@ -35,7 +35,7 @@ jobs:
 
       - name: Output prüfen
         run: |
-          if [ ! -f output/events_this_weekend.html ]; then
+          if [ ! -f output/index.html ]; then
             echo "ERROR: HTML-Datei wurde nicht generiert!"
             exit 1
           fi
