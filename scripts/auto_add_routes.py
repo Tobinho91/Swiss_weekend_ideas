@@ -1,224 +1,191 @@
 #!/usr/bin/env python3
 """
 Automated route addition script for GitHub Actions.
-This script adds 10 random curated routes to the fallback pool each month.
+Appends 10 new curated hiking routes to data/schweizmobil_routes.json each month.
 """
 
 import json
 import random
-import re
 from datetime import datetime
 from pathlib import Path
 
 # Curated route candidates for monthly additions
 ROUTES_CANDIDATES = [
     {
-        "title": "Monte Rosa Höhenweg",
-        "difficulty": "T3",
-        "duration_minutes": 360,
-        "distance_km": 22.0,
-        "region": "Wallis",
-        "canton": "VS",
-        "route_id": "630",
-        "elevation_gain_m": 1400,
-        "elevation_loss_m": 1400,
-        "start_point": "Täsch",
-        "end_point": "Riedgletscher",
-        "description": "Spektakuläre Höhenwanderung um den Monte Rosa mit Blick auf 60 Viertausender.",
-        "tags": ["Monte Rosa", "Höhenweg", "Wallis"],
-    },
-    {
-        "title": "Dom Besteigung",
-        "difficulty": "T4",
-        "duration_minutes": 480,
-        "distance_km": 20.0,
-        "region": "Wallis",
-        "canton": "VS",
-        "route_id": "635",
-        "elevation_gain_m": 2000,
-        "elevation_loss_m": 2000,
-        "start_point": "Randa",
-        "end_point": "Randa",
-        "description": "Anspruchsvolle Besteigung des Dom - Höchster Berg der Schweiz.",
-        "tags": ["Dom", "Viertausender", "Wallis"],
-    },
-    {
-        "title": "Appenzeller Höhenweg",
-        "difficulty": "T2",
-        "duration_minutes": 240,
-        "distance_km": 14.0,
-        "region": "Ostschweiz",
+        "id": 25,
+        "title": "Säntis-Panoramaweg",
+        "region": "Appenzell",
         "canton": "AR",
-        "route_id": "960",
-        "elevation_gain_m": 600,
-        "elevation_loss_m": 600,
-        "start_point": "Herisau",
-        "end_point": "Walzenhausen",
-        "description": "Klassischer Höhenweg durch das Appenzeller Hügelland mit Blick auf Säntis und Bodensee.",
-        "tags": ["Appenzell", "Höhenweg", "Panorama"],
+        "duration_minutes": 300,
+        "distance_km": 16.0
     },
     {
-        "title": "Säntis Säntis Trail",
-        "difficulty": "T1",
+        "id": 26,
+        "title": "Appenzeller Alproute",
+        "region": "Appenzell",
+        "canton": "AR",
+        "duration_minutes": 240,
+        "distance_km": 14.0
+    },
+    {
+        "id": 28,
+        "title": "Säntis via Schwägalp",
+        "region": "Appenzell",
+        "canton": "AR",
+        "duration_minutes": 300,
+        "distance_km": 15.0
+    },
+    {
+        "id": 30,
+        "title": "Säntis Rundgang",
+        "region": "Appenzell",
+        "canton": "AR",
         "duration_minutes": 180,
-        "distance_km": 10.0,
-        "region": "Ostschweiz",
-        "canton": "AR",
-        "route_id": "955",
-        "elevation_gain_m": 500,
-        "elevation_loss_m": 500,
-        "start_point": "Säntis Kulm",
-        "end_point": "Appenzell",
-        "description": "Einfache Wanderung vom Säntis hinunter mit Panoramablick.",
-        "tags": ["Säntis", "Familie", "Appenzell"],
+        "distance_km": 10.0
     },
     {
-        "title": "Toggenburg Höhenweg",
-        "difficulty": "T2",
-        "duration_minutes": 300,
-        "distance_km": 18.0,
-        "region": "Ostschweiz",
-        "canton": "SG",
-        "route_id": "830",
-        "elevation_gain_m": 800,
-        "elevation_loss_m": 800,
-        "start_point": "Unterwasser",
-        "end_point": "Wildhaus",
-        "description": "Spektakulärer Höhenweg durch das wunderschöne Toggenburg mit Säntis-Blick.",
-        "tags": ["Toggenburg", "Höhenweg", "Säntis"],
-    },
-    {
-        "title": "Appenzeller Vorderland Spaziergang",
-        "difficulty": "T1",
-        "duration_minutes": 120,
-        "distance_km": 7.0,
-        "region": "Ostschweiz",
-        "canton": "AR",
-        "route_id": "970",
-        "elevation_gain_m": 200,
-        "elevation_loss_m": 200,
-        "start_point": "Gonten",
-        "end_point": "Herisau",
-        "description": "Einfache Spaziergang durch das typische Appenzeller Vorderland.",
-        "tags": ["Appenzell", "Familie", "Tradition"],
-    },
-    {
-        "title": "Beatenbucht Höhenweg",
-        "difficulty": "T3",
-        "duration_minutes": 300,
-        "distance_km": 16.0,
-        "region": "Berner Oberland",
-        "canton": "BE",
-        "route_id": "555",
-        "elevation_gain_m": 1000,
-        "elevation_loss_m": 1000,
-        "start_point": "Beatenberg",
-        "end_point": "Merligen",
-        "description": "Anspruchsvolle Bergwanderung mit spektakulärem Thuner See Panorama.",
-        "tags": ["Thunersee", "Berge", "Berner Oberland"],
-    },
-    {
-        "title": "Brienzer Rothorn",
-        "difficulty": "T3",
-        "duration_minutes": 300,
-        "distance_km": 15.0,
-        "region": "Berner Oberland",
-        "canton": "BE",
-        "route_id": "560",
-        "elevation_gain_m": 1200,
-        "elevation_loss_m": 1200,
-        "start_point": "Brienz",
-        "end_point": "Brienzer Rothorn",
-        "description": "Bergwanderung zum Brienzer Rothorn mit herrlichem Blick über die Seen.",
-        "tags": ["Rothorn", "Seen", "Berner Oberland"],
-    },
-    {
-        "title": "Sustenpass Wanderung",
-        "difficulty": "T2",
+        "id": 45,
+        "title": "Lägern Höhenweg",
+        "region": "Zürich",
+        "canton": "ZH",
         "duration_minutes": 240,
-        "distance_km": 13.0,
-        "region": "Berner Oberland",
-        "canton": "BE",
-        "route_id": "540",
-        "elevation_gain_m": 600,
-        "elevation_loss_m": 600,
-        "start_point": "Gadmen",
-        "end_point": "Wassen",
-        "description": "Klassische Wanderung über den historischen Sustenpass.",
-        "tags": ["Sustenpass", "Historisch", "Alpen"],
+        "distance_km": 14.0
     },
     {
-        "title": "Furkapass Höhenwanderung",
-        "difficulty": "T2",
-        "duration_minutes": 270,
-        "distance_km": 15.0,
-        "region": "Wallis",
-        "canton": "VS",
-        "route_id": "650",
-        "elevation_gain_m": 700,
-        "elevation_loss_m": 700,
-        "start_point": "Gletsch",
-        "end_point": "Realp",
-        "description": "Wanderung über den spektakulären Furkapass mit Gletscher-Ausblick.",
-        "tags": ["Furka", "Gletscher", "Höhenpass"],
-    },
-    {
-        "title": "Tschingelhörner Bergtour",
-        "difficulty": "T3",
+        "id": 50,
+        "title": "Säntis Wanderung",
+        "region": "Appenzell",
+        "canton": "AR",
         "duration_minutes": 360,
-        "distance_km": 18.0,
-        "region": "Berner Oberland",
-        "canton": "BE",
-        "route_id": "570",
-        "elevation_gain_m": 1300,
-        "elevation_loss_m": 1300,
-        "start_point": "Guttannen",
-        "end_point": "Guttannen",
-        "description": "Bergtour zu den Tschingelhörnern mit Alpine Luft und herrlichen Aussichten.",
-        "tags": ["Tschingel", "Bergtour", "Berner Oberland"],
+        "distance_km": 18.0
     },
+    {
+        "id": 51,
+        "title": "Säntis Bergtour",
+        "region": "Appenzell",
+        "canton": "AR",
+        "duration_minutes": 300,
+        "distance_km": 16.0
+    },
+    {
+        "id": 52,
+        "title": "Säntis Kulm",
+        "region": "Appenzell",
+        "canton": "AR",
+        "duration_minutes": 240,
+        "distance_km": 12.0
+    },
+    {
+        "id": 53,
+        "title": "Säntis Panorama",
+        "region": "Appenzell",
+        "canton": "AR",
+        "duration_minutes": 300,
+        "distance_km": 15.0
+    },
+    {
+        "id": 54,
+        "title": "Säntis Rundtour",
+        "region": "Appenzell",
+        "canton": "AR",
+        "duration_minutes": 360,
+        "distance_km": 20.0
+    },
+    {
+        "id": 55,
+        "title": "Säntis Höhenweg",
+        "region": "Appenzell",
+        "canton": "AR",
+        "duration_minutes": 300,
+        "distance_km": 17.0
+    },
+    {
+        "id": 56,
+        "title": "Appenzeller Alpstein",
+        "region": "Appenzell",
+        "canton": "AR",
+        "duration_minutes": 360,
+        "distance_km": 19.0
+    },
+    {
+        "id": 60,
+        "title": "Säntis Etappe",
+        "region": "Appenzell",
+        "canton": "AR",
+        "duration_minutes": 240,
+        "distance_km": 13.0
+    },
+    {
+        "id": 65,
+        "title": "Säntis Klassiker",
+        "region": "Appenzell",
+        "canton": "AR",
+        "duration_minutes": 300,
+        "distance_km": 16.0
+    },
+    {
+        "id": 70,
+        "title": "Säntis Trail",
+        "region": "Appenzell",
+        "canton": "AR",
+        "duration_minutes": 240,
+        "distance_km": 14.0
+    },
+    {
+        "id": 75,
+        "title": "Säntis Naturweg",
+        "region": "Appenzell",
+        "canton": "AR",
+        "duration_minutes": 300,
+        "distance_km": 15.0
+    },
+    {
+        "id": 80,
+        "title": "Säntis Waldweg",
+        "region": "Appenzell",
+        "canton": "AR",
+        "duration_minutes": 240,
+        "distance_km": 12.0
+    },
+    {
+        "id": 85,
+        "title": "Säntis Fernblick",
+        "region": "Appenzell",
+        "canton": "AR",
+        "duration_minutes": 300,
+        "distance_km": 16.0
+    },
+    {
+        "id": 90,
+        "title": "Säntis Gipfelweg",
+        "region": "Appenzell",
+        "canton": "AR",
+        "duration_minutes": 360,
+        "distance_km": 18.0
+    },
+    {
+        "id": 95,
+        "title": "Säntis Sternenwanderung",
+        "region": "Appenzell",
+        "canton": "AR",
+        "duration_minutes": 300,
+        "distance_km": 15.0
+    }
 ]
 
 
-def generate_hike_code(route: dict, fallback_id: int) -> str:
-    """Generate Python code for a Hike object."""
-    code = f'''            Hike(
-                title="{route['title']}",
-                difficulty=self.normalize_difficulty("{route['difficulty']}"),
-                duration_minutes={route['duration_minutes']},
-                distance_km={route['distance_km']},
-                region="{route['region']}",
-                canton="{route['canton']}",
-                source="schweizmobil",
-                source_url="https://www.schweizmobil.ch/de/wanderland/route-{route['route_id']}",
-                elevation_gain_m={route['elevation_gain_m']},
-                elevation_loss_m={route['elevation_loss_m']},
-                start_point="{route['start_point']}",
-                end_point="{route['end_point']}",
-                description="{route['description']}",
-                latitude_start={route.get('latitude_start', 47.0)},
-                longitude_start={route.get('longitude_start', 8.0)},
-                tags={route['tags']},
-                external_id="schweizmobil-fallback-{fallback_id}",
-            ),'''
-    return code
+def get_existing_ids(json_file: Path) -> set:
+    """Get all existing route IDs from the JSON file."""
+    try:
+        data = json.loads(json_file.read_text(encoding="utf-8"))
+        return {int(route["id"]) for route in data}
+    except Exception:
+        return set()
 
 
-def get_already_added_routes(content: str) -> set:
-    """Extract titles of routes already in the file to avoid duplicates."""
-    added_titles = set()
-    # Find all route titles in the file
-    for candidate in ROUTES_CANDIDATES:
-        title = candidate['title']
-        # Check if this route title already exists in the file
-        if f'title="{title}"' in content:
-            added_titles.add(title)
-    return added_titles
-
-
-def add_routes_to_file(num_routes: int = 10) -> bool:
+def add_routes_to_json(num_routes: int = 10) -> bool:
     """
-    Add random routes to schweizmobil.py
+    Add random routes to data/schweizmobil_routes.json
 
     Args:
         num_routes: Number of routes to add
@@ -227,68 +194,46 @@ def add_routes_to_file(num_routes: int = 10) -> bool:
         True if successful, False otherwise
     """
     try:
-        # Read the current file
-        file_path = Path("scrapers/hiking/schweizmobil.py")
-        content = file_path.read_text(encoding="utf-8")
+        json_file = Path("data/schweizmobil_routes.json")
 
-        # Find the highest external_id to continue the numbering
-        matches = re.findall(r'external_id="schweizmobil-fallback-(\d+)"', content)
-        if not matches:
-            print("[ERROR] Could not find existing routes in file")
+        if not json_file.exists():
+            print("[ERROR] File not found: data/schweizmobil_routes.json")
             return False
 
-        last_id = max(int(m) for m in matches)
-        next_id = last_id + 1
+        # Load existing routes
+        existing_data = json.loads(json_file.read_text(encoding="utf-8"))
+        existing_ids = get_existing_ids(json_file)
 
-        # Filter out routes that have already been added (no duplicates)
-        already_added = get_already_added_routes(content)
+        # Filter candidates to exclude already-added routes
         available_candidates = [
             route for route in ROUTES_CANDIDATES
-            if route['title'] not in already_added
+            if route["id"] not in existing_ids
         ]
 
         if not available_candidates:
             print("[WARN] All candidate routes have already been added!")
             return False
 
-        # Select random routes from available candidates
+        # Select random routes
         selected = random.sample(
             available_candidates,
             min(num_routes, len(available_candidates))
         )
 
-        # Generate code for new routes
-        new_routes_code = "\n".join(
-            generate_hike_code(route, next_id + i) for i, route in enumerate(selected)
-        )
-
-        # Find insertion point: last route's closing paren before the `]` bracket
-        insertion_pattern = r'(\),)\n(\s+)\]'
-        if not re.search(insertion_pattern, content):
-            print("[ERROR] Could not find insertion point in file")
-            return False
-
-        # Insert the new routes, preserving the last route's closing paren and indentation
-        def replacement(match):
-            closing_paren = match.group(1)  # `)`,
-            indent = match.group(2)         # whitespace
-            return f'{closing_paren}\n{new_routes_code}\n{indent}]'
-
-        new_content = re.sub(
-            insertion_pattern,
-            replacement,
-            content,
-            count=1  # Only replace the last occurrence (safest)
-        )
+        # Append to existing data
+        existing_data.extend(selected)
 
         # Write back to file
-        file_path.write_text(new_content, encoding="utf-8")
+        json_file.write_text(
+            json.dumps(existing_data, indent=2, ensure_ascii=False),
+            encoding="utf-8"
+        )
 
         print(f"[OK] Added {len(selected)} new hiking routes")
-        print(f"   Route IDs: {next_id} - {next_id + len(selected) - 1}")
+        print(f"   Route IDs: {', '.join(str(r['id']) for r in selected)}")
         print(f"   Routes added:")
         for i, route in enumerate(selected, 1):
-            print(f"   {i:2d}. {route['title']}")
+            print(f"   {i:2d}. {route['title']} ({route['canton']})")
 
         return True
 
@@ -298,5 +243,5 @@ def add_routes_to_file(num_routes: int = 10) -> bool:
 
 
 if __name__ == "__main__":
-    success = add_routes_to_file(10)
+    success = add_routes_to_json(10)
     exit(0 if success else 1)
